@@ -48,11 +48,11 @@ class MyClient(discord.Client):
             if int(message_split[3]) == num:
                 await message.reply(f'You won :D\nYour choice: {message_split[3]}\nThe random number: {num}')
 
-                if str(message.author.id) in score:
-                    score[str(message.author.id)] += 1
+                if str(message.author.id) in score[str(message.guild.id)]:
+                    score[str(message.guild.id)][str(message.author.id)] += 1
 
                 else:
-                    score[str(message.author.id)] = 1
+                    score[str(message.guild.id)][str(message.author.id)] = 1
 
                 with open('data.json', 'w') as f:
                     json.dump(score, f, indent=4)
@@ -61,11 +61,11 @@ class MyClient(discord.Client):
                 await message.reply(f'You lose :O\nYour choice: {message_split[3]}\nThe random number: {num}')
 
         if message.content.lower().startswith('score'):
-            if str(message.author.id) not in score:
+            if str(message.author.id) not in score[str(message.guild.id)]:
                 await message.reply('Your score: 0')
                 return
 
-            await message.reply(f'Your score: {score[str(message.author.id)]}')
+            await message.reply(f'Your score: {score[str(message.guild.id)][str(message.author.id)]}')
 
 
 client = MyClient()
