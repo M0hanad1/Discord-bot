@@ -11,11 +11,11 @@ class MyClient(discord.Client):
         with open('data.json') as f:
             score = json.load(f)
 
-            with open('data.json', 'w') as f:
-                json.dump(score, f, indent=4)
+        with open('data.json', 'w') as f:
+            if str(message.guild.id) not in score:
+                score[message.guild.id] = {}
 
-        with open('data.json') as f:
-            score = json.load(f)
+            json.dump(score, f, indent=4)
 
         # don't respond to ourselves
         if message.author == self.user:
