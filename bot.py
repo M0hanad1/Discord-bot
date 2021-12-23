@@ -1,6 +1,9 @@
+import os
+from dotenv import load_dotenv
 from discord.ext import commands
 
 
+load_dotenv()
 bot = commands.Bot(command_prefix='?')
-bot.load_extension("maincog")
-bot.run('ODk1NjMzOTc1Mjc0NTMyOTA2.YV7aIw.yKMuk3-8DPqhcb-EhARQwytDWFE')
+bot.load_extension("main")
+bot.run(os.getenv('TOKEN'))

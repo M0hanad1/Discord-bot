@@ -1,11 +1,11 @@
-import discord
-import json
 from discord.ext import commands
 from random import randint
 from os import mkdir
 from os.path import exists, isfile
 from asyncio import TimeoutError
 from json.decoder import JSONDecodeError
+import discord
+import json
 
 
 class DiscordBot(commands.Cog):
@@ -81,7 +81,7 @@ class DiscordBot(commands.Cog):
             random_num = randint(1, 10)
             chance = 3
 
-            await ctx.reply(f'Choose a random number from 0 to 10\nYou have 3 chances')
+            await ctx.reply(f'Choose a random number from 1 to 10\nYou have 3 chances')
 
             while True:
                 try:
@@ -112,6 +112,7 @@ class DiscordBot(commands.Cog):
                 return
 
             await message.reply(f'You lose\nThe random number was: {random_num}')
+            return
 
         if user_choice == (random_num := randint(start, end)):
             await ctx.reply(f'You won :D\nYour choice: {user_choice}\nThe random number: {random_num}')
