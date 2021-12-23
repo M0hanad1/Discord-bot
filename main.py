@@ -1,6 +1,7 @@
 import discord
 import json
 import random
+from string import digits
 
 
 class MyClient(discord.Client):
@@ -61,11 +62,33 @@ class MyClient(discord.Client):
                 await message.reply(f'You lose :O\nYour choice: {message_split[3]}\nThe random number: {num}')
 
         if message.content.lower().startswith('score'):
-            if str(message.author.id) not in score[str(message.guild.id)]:
-                await message.reply('Your score: 0')
+            if len(message.content.replace(' ', '')) > 5:
+                person_id = message.content.replace(' ', '')[8:-1]
+
+            else:
+                person_id = str(message.author.id)
+
+            if person_id not in score[str(message.guild.id)]:
+                await message.reply(f'<@{person_id}> score: 0')
                 return
 
-            await message.reply(f'Your score: {score[str(message.guild.id)][str(message.author.id)]}')
+            await message.reply(f'<@{person_id}> score: {score[str(message.guild.id)][person_id]}')
+
+        if message.content.lower().startswith('calc'):
+            calc_punctuation = ['.', '(', ')', '/', '+', '-', '*']
+
+            numbers = message.content.replace(' ', '')[4:]
+
+            for i in numbers:
+                if i not in digits and i not in calc_punctuation:
+                    await message.reply('Syntax Error!')
+                    return
+
+            try:
+                await message.reply(f'Your calculation: {eval(numbers)}')
+
+            except ZeroDivisionError:
+                await message.reply('Zero Division error!')
 
 
 client = MyClient()
