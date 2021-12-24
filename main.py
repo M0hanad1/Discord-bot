@@ -1,7 +1,7 @@
 from discord.ext import commands
 from random import randint
 from os import mkdir
-from os.path import exists, isfile
+from os.path import exists, isfile, getsize
 from asyncio import TimeoutError
 from json.decoder import JSONDecodeError
 import discord
@@ -18,12 +18,12 @@ class DiscordBot(commands.Cog):
         mkdir(folder)
 
         with open(data_path, 'w') as f:
-            json.dump({} + '\n', f, indent=4)
+            json.dump({}, f, indent=4)
 
     else:
-        if isfile(data_path) is False:
+        if isfile(data_path) is False or getsize(data_path) == 0:
             with open(data_path, 'w') as f:
-                json.dump({} + '\n', f, indent=4)
+                json.dump({}, f, indent=4)
 
     try:
         with open(data_path) as f:
@@ -31,7 +31,7 @@ class DiscordBot(commands.Cog):
 
     except JSONDecodeError:
         with open(data_path) as f:
-            json.dump({} + '\n', f, indent=4)
+            json.dump({}, f, indent=4)
 
     def __init__(self, bot) -> None:
         self.bot = bot
@@ -56,6 +56,11 @@ class DiscordBot(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(f'{self.bot.user} went online')
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if str(message.guild.id) not in DiscordBot.user_score:
+            self.user_score[str(message.guild.id)] = {}
 
     @commands.command()
     async def score(self, ctx, member: discord.Member=None):
