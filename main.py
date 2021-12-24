@@ -90,7 +90,7 @@ class DiscordBot(commands.Cog):
 
             while True:
                 try:
-                    message = await self.bot.wait_for('message', check=lambda message: message.content.replace(' ', '').isdigit(), timeout=15.0)
+                    message = await self.bot.wait_for('message', check=lambda message: message.content.replace(' ', '').isdigit() and ctx.author == message.author, timeout=15.0)
 
                 except TimeoutError:
                     await ctx.send(f'Time out :)\nThe random number: {random_num}')
