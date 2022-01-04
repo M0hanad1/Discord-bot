@@ -1,4 +1,4 @@
 test*
 __pycache__/
 .env
-assest/img/temp_image.png
+temp*.png
