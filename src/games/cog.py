@@ -12,6 +12,8 @@ class Games(commands.Cog):
         self.bot = bot
         self.temp = {}
         self.assest_path = './assest/'
+        self.words_path = self.assest_path + 'words/'
+        self.img_path = self.assest_path + 'img/'
         self.data = Data()
 
     async def typing_games(self, ctx, lang, mood):
@@ -19,34 +21,29 @@ class Games(commands.Cog):
             await ctx.reply(embed=Functions.create_embeds(ctx, ('You already in a game', '')))
             return
 
-        lang_files = [f'{self.assest_path}english_words.txt', f'{self.assest_path}arabic_words.txt']
+        lang_files = [f'{self.words_path}english_words.txt', f'{self.words_path}arabic_words.txt']
 
-        if lang is None:
-            the_lang = choice(lang_files)
-
-        elif lang == 'en' or lang == 'english':
+        if lang == 'en' or lang == 'english':
             the_lang = lang_files[0]
 
         elif lang == 'ar' or lang == 'arabic':
             the_lang = lang_files[1]
 
         else:
-            await ctx.reply(embed=Functions.create_embeds(ctx, ('I can\'t find this language', '')))
-            Functions.temp_remove(self.temp, ctx)
-            return
+            the_lang = choice(lang_files)
 
         with open(the_lang, encoding='utf-8') as f:
             word = choice(f.readlines()).replace('\n', '')
 
             if the_lang == lang_files[1]:
-                Functions.create_image(Functions.arabic_convert(word), self.assest_path)
+                Functions.create_image(Functions.arabic_convert(word), self.img_path + 'temp_image.png')
 
             else:
-                Functions.create_image(word, self.assest_path)
+                Functions.create_image(word, self.img_path + 'temp_image.png')
 
         await ctx.reply(
-            file=discord.File(f'{self.assest_path}image.png', filename='image.png'),
-            embed=Functions.create_embeds(ctx, embed_image='attachment://image.png')
+            file=discord.File(f'{self.img_path}temp_image.png', filename='img.png'),
+            embed=Functions.create_embeds(ctx, embed_image='attachment://img.png')
             )
 
         start = time.time()

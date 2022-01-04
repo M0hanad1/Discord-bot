@@ -35,7 +35,7 @@ class Functions:
         d = ImageDraw.Draw(img)
 
         d.text(((w - fw) / 2, (h - fh) / 2), string, font=fnt, fill='black')
-        img.save(f'{path}image.png')
+        img.save(path)
 
     @staticmethod
     def arabic_convert(string):
