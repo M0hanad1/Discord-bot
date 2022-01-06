@@ -3,3 +3,5 @@ dnspython
 PyNaCl
 async-timeout
 python-dotenv
+pymongo
+pymongo[srv]
