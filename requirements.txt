@@ -5,7 +5,6 @@ asyncio
 dnspython
 PyNaCl
 async-timeout
-json
 os
 python-dotenv
 pillow
