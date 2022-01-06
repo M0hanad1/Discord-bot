@@ -1,7 +1,12 @@
 git+https://github.com/Rapptz/discord.py
+discord.py
+requests
+asyncio
 dnspython
 PyNaCl
 async-timeout
+json
+os
 python-dotenv
 pillow
 arabic-reshaper
