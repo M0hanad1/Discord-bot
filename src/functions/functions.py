@@ -1,7 +1,6 @@
 import discord
 from arabic_reshaper import reshape
 from PIL import Image, ImageDraw, ImageFont
-from bidi.algorithm import get_display
 
 
 class Functions:
