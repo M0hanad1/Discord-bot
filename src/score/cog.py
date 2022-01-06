@@ -1,61 +1,69 @@
 import discord
-import math
 from discord.ext import commands
 from src.functions.functions import Functions
-from src.data.data import Data
+from src.score.score import ScoreData
 
 
 class Score(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        self.data = Data()
+        self.data = ScoreData()
 
     async def top_gen(self, ctx, mood, page):
-        id_ = str(ctx.author.id)
-        all_score = {}
+        scores = dict(sorted(self.data.get_all_score().items(), key=lambda item: item[1], reverse=True))
+        temp = scores.copy()
+
+        if mood == 'local':
+            for i in scores:
+                if ctx.guild.get_member(i) is None:
+                    del temp[i]
+
+        scores = temp
+
+        if ctx.author.id not in scores:
+            scores[ctx.author.id] = 0
+
+        author_data = [ctx.author.id, list(scores.keys()).index(ctx.author.id)+1, scores[ctx.author.id]]
+        num = 1
+        count = 1
         message = ''
         all_messages = []
-        num = 1
-        count_num = 1
-        first = True
 
-        for i in self.data.users_data:
-            if ((mood == 'local' and ctx.guild.get_member(int(i)) is not None) or (mood == 'global')) and ((temp := self.data.get_score(i)) != -1):
-                all_score[i] = temp
+        for i, j in scores.items():
+            if count == 10:
+                if str(author_data[0]) not in message:
+                    if author_data[1] < num:
+                        message = f'**{author_data[1]}- <@{author_data[0]}>: {author_data[2]}\n**' + message
 
-        all_score = dict(sorted(all_score.items(), key=lambda item: item[1], reverse=True))
+                    else:
+                        message += f'**{author_data[1]}- <@{author_data[0]}>: {author_data[2]}\n**'
 
-        if page > math.ceil(len(all_score) / 10):
-            page = 1
-
-        author_data = None if id_ not in all_score else [all_score[id_], list(all_score.keys()).index(id_)+1]
-
-        for i, j in all_score.items():
-            if first:
-                if author_data is not None and author_data[0] > j:
-                    message += f'**{author_data[1]}- <@!{id_}>: {author_data[0]}**\n'
-
-                first = False
-
-            if id_ == i:
-                message += f'**{num}- <@!{i}>: {j}**\n'
-
-            else:
-                message += f'{num}- <@!{i}>: {j}\n'
-
-            num += 1
-            count_num += 1
-
-            if count_num == 11:
-                if id_ not in message:
-                    message += f'**{author_data[1]}- <@!{id_}>: {author_data[0]}**\n'
-
-                count_num = 1
-                first = True
                 all_messages.append(message)
+                count = 1
                 message = ''
 
-        all_messages.append(message)
+            if author_data[0] == i:
+                message += f'**{num}- <@{i}>: {j}**\n'
+
+            else:
+                message += f'{num}- <@{i}>: {j}\n'
+
+            num += 1
+            count += 1
+
+        if len(message) > 0:
+            if str(author_data[0]) not in message:
+                    if author_data[1] < num:
+                        message = f'**{author_data[1]}- <@{author_data[0]}>: {author_data[2]}\n**' + message
+
+                    else:
+                        message += f'**{author_data[1]}- <@{author_data[0]}>: {author_data[2]}\n**'
+
+            all_messages.append(message)
+
+        if page > len(all_messages):
+            page = 1
+
         await ctx.reply(embed=Functions.create_embeds(ctx, (f'Top {mood} score [{page} | {len(all_messages)}]:', all_messages[page-1])))
 
     @commands.command(name='top', aliases=['top-u', 'top-l', 'top-user', 'top-local'])
@@ -69,10 +77,8 @@ class Score(commands.Cog):
     @commands.command()
     async def score(self, ctx, member: discord.Member=None):
         member = ctx.author if member is None else member
-        user_score = self.data.get_score(str(member.id))
-        user_score = 0 if user_score == -1 else user_score
 
-        await ctx.reply(embed=Functions.create_embeds(ctx, (f'Score:\n{user_score}', ''), (member.name, member.avatar.url)))
+        await ctx.reply(embed=Functions.create_embeds(ctx, (f'Score:\n{self.data.get_score(member.id)}', ''), (member.name, member.avatar.url)))
 
 def setup(bot: commands.Bot):
     bot.add_cog(Score(bot))

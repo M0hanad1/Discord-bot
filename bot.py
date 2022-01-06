@@ -15,5 +15,10 @@ for folder in os.listdir('./src'):
         bot.load_extension(f'src.{folder}.cog')
 
 
+@bot.event
+async def on_ready():
+    print('bot is ready')
+
+
 if __name__ == '__main__':
     bot.run(os.getenv('TOKEN'))

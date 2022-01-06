@@ -14,7 +14,10 @@ class Functions:
         )
 
         if embed_footer is None:
-            new_embed.set_footer(text=str(ctx.author.name), icon_url=ctx.author.avatar.url)
+            new_embed.set_footer(text=f'{str(ctx.author.name)}#{str(ctx.author.discriminator)}', icon_url=ctx.author.avatar.url)
+
+        else:
+            new_embed.set_footer(text=embed_footer[0], icon_url=embed_footer[1])
 
         new_embed.set_author(name=embed_author[0], icon_url=embed_author[1])
         new_embed.set_image(url=embed_image)

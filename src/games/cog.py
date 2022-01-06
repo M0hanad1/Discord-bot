@@ -1,7 +1,7 @@
 import discord
 import time
 from src.functions.functions import Functions
-from src.data.data import Data
+from src.score.score import ScoreData
 from random import choice, randint
 from discord.ext import commands
 from asyncio import TimeoutError
@@ -14,7 +14,7 @@ class Games(commands.Cog):
         self.assest_path = './assest/'
         self.words_path = self.assest_path + 'words/'
         self.img_path = self.assest_path + 'img/'
-        self.data = Data()
+        self.data = ScoreData()
 
     async def typing_games(self, ctx, lang, mood):
         if Functions.temp_check(self.temp, ctx):
@@ -59,11 +59,7 @@ class Games(commands.Cog):
                 continue
 
             if (mood == 'fast' and message.content.lower() == word) or (mood == 'dis' and message.content.lower() == ' '.join([i for i in word])):
-                if (score_temp := self.data.get_score(str(message.author.id))) == -1:
-                    self.data.add_user(str(message.author.id))
-                    score_temp = 0
-
-                self.data.change_score(str(message.author.id), score_temp+1)
+                self.data.add_score(message.author.id, self.data.get_score(message.author.id) + 1)
                 await message.reply(embed=Functions.create_embeds(ctx, (f'You Won\nYou took {result[:4]}', '')))
                 Functions.temp_remove(self.temp, ctx)
                 return
@@ -115,11 +111,7 @@ class Games(commands.Cog):
 
                 continue
 
-            if (score_temp := self.data.get_score(str(message.author.id))) == -1:
-                self.data.add_user(str(message.author.id))
-                score_temp = 0
-
-            self.data.change_score(str(message.author.id), score_temp+1)
+            self.data.add_score(message.author.id, self.data.get_score(message.author.id) + 1)
             await message.reply(embed=Functions.create_embeds(message, (f'You Won\nThe random number was: {random_num}', '')))
             Functions.temp_remove(self.temp, ctx)
             return
