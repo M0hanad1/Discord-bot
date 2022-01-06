@@ -3,5 +3,8 @@ dnspython
 PyNaCl
 async-timeout
 python-dotenv
+pillow
+arabic-reshaper
+python-bidi
 pymongo
 pymongo[srv]
