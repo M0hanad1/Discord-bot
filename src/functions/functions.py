@@ -33,7 +33,7 @@ class Functions:
         w, h = 450, 150
         img = Image.new('RGB', (w, h), color = 'white')
 
-        fnt = ImageFont.truetype('arial.ttf', 70)
+        fnt = ImageFont.truetype('./assest/fonts/arial.ttf', 70)
         fw, fh = fnt.getsize(string)
         d = ImageDraw.Draw(img)
 
