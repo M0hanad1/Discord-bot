@@ -17,7 +17,7 @@ for folder in os.listdir('./src'):
 
 @bot.event
 async def on_ready():
-    print('bot is ready')
+    print(f'{bot.user} is ready')
 
 
 if __name__ == '__main__':
