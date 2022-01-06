@@ -36,13 +36,13 @@ class Games(commands.Cog):
             word = choice(f.readlines()).replace('\n', '')
 
             if the_lang == lang_files[1]:
-                Functions.create_image(Functions.arabic_convert(word), self.img_path + 'temp_image.png')
+                Functions.create_image(Functions.arabic_convert(word), self.img_path + 'temp_img.png')
 
             else:
-                Functions.create_image(word, self.img_path + 'temp_image.png')
+                Functions.create_image(word, self.img_path + 'img.png')
 
         await ctx.reply(
-            file=discord.File(f'{self.img_path}temp_image.png', filename='img.png'),
+            file=discord.File(f'{self.img_path}temp_img.png', filename='img.png'),
             embed=Functions.create_embeds(ctx, embed_image='attachment://img.png')
             )
 
