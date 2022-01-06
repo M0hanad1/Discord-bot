@@ -39,7 +39,7 @@ class Games(commands.Cog):
                 Functions.create_image(Functions.arabic_convert(word), self.img_path + 'temp_img.png')
 
             else:
-                Functions.create_image(word, self.img_path + 'img.png')
+                Functions.create_image(word, self.img_path + 'temp_img.png')
 
         await ctx.reply(
             file=discord.File(f'{self.img_path}temp_img.png', filename='img.png'),

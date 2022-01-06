@@ -37,6 +37,10 @@ class Functions:
         d = ImageDraw.Draw(img)
 
         d.text(((w - fw) / 2, (h - fh) / 2), string, font=fnt, fill='black')
+
+        with open(path, 'w'):
+            pass
+
         img.save(path)
 
     @staticmethod
