@@ -3,7 +3,7 @@ import pymongo
 
 class Database:
     def __init__(self, host: str, database: str) -> None:
-        self.client = pymongo.MongoClient(host)
+        self.client = pymongo.MongoClient(host, connect=False)
         self.db = self.client[database]
         self.collections = {}
 
