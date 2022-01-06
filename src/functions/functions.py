@@ -42,7 +42,7 @@ class Functions:
 
     @staticmethod
     def arabic_convert(string):
-        return get_display(reshape(string))
+        return reshape(string)
 
     @staticmethod
     def temp_check(temp, ctx):
