@@ -3,7 +3,7 @@ from src.data.data import Data
 
 
 class Prefix():
-    DEFAULT_PREFIX = '*'
+    DEFAULT_PREFIX = '+'
 
     def __init__(self) -> None:
         self.data = Data()

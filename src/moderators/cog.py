@@ -81,6 +81,11 @@ class ModsCommands(commands.Cog, name='Mods'):
         """To change member nickname with prefix command"""
         await ctx.reply(embed=(await self.mod.nick(ctx, member, name, 'No reason'))[0])
 
+    @commands.command(name='role')
+    async def command_role(self, ctx, member: discord.Member, role: discord.Role, *, reason='No reason'):
+        """To [add|remove] role [to|from] member with prefix command"""
+        await ctx.reply(embed=(await self.mod.role(ctx, member, role, reason))[0])
+
     @slash_command(name='kick')
     @commands.has_permissions(kick_members=True)
     async def slash_kick(self, ctx, member: Option(discord.Member, 'Member you want to kick'), reason: Option(str, 'Reason of the kick', required=False, default='No reason')):
@@ -131,13 +136,13 @@ class ModsCommands(commands.Cog, name='Mods'):
 
     @slash_command(name='nickname')
     async def slash_nick(self, ctx, member: Option(discord.Member, 'Member you want to change his nickname', required=False, default=None), name: Option(str, 'The new nickname', required=False, default=None), reason: Option(str, 'Reason of change the nickname', required=False, default='No reason')):
-        """To change [your|member] nickname with slash command"""
+        """To change [your | member] nickname with slash command"""
         await ctx.respond(embed=(temp := (await self.mod.nick(ctx, (ctx.author if member is None else member), name, reason)))[0], ephemeral=temp[1])
 
-    @slash_command(name='role', guild_ids=[787082535553335337])
+    @slash_command(name='role')
     @commands.has_permissions(manage_roles=True)
-    async def slash_role(self, ctx, member: Option(discord.Member, 'Member you want to [add|remove] the role [to|from] it'), role: Option(discord.Role, 'Role you want to give it to that member'), reason: Option(str, 'Reason of [add|remove] the role', required=False, default='No reason')):
-        """To [add|remove] role [to|from] a member"""
+    async def slash_role(self, ctx, member: Option(discord.Member, 'Member you want to [add | remove] the role [to | from] it'), role: Option(discord.Role, 'Role you want to give it to that member'), reason: Option(str, 'Reason of [add | remove] the role', required=False, default='No reason')):
+        """To [add | remove] role [to | from] a member"""
         await ctx.respond(embed=(temp := (await self.mod.role(ctx, member, role, reason)))[0], ephemeral=temp[1])
 
 

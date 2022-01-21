@@ -1,11 +1,13 @@
 wheel
 git+https://github.com/Pycord-Development/pycord
+py-cord[speed]
+py-cord[voice]
 PyNaCl==1.4.0
 requests==2.26.0
 dnspython==2.1.0
 async-timeout==3.0.1
 python-dotenv==0.19.2
-pillow==8.3.2
+pillow==9.0.0
 arabic-reshaper==2.1.3
 pymongo==4.0.1
 pymongo[srv]

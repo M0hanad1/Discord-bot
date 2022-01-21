@@ -1,4 +1,3 @@
-import discord
 from discord.ext import commands
 from discord.commands import slash_command, Option
 from src.music.music import Music
@@ -67,7 +66,7 @@ class MusicCommands(commands.Cog, name='Music'):
 
     @commands.command(name='volume', aliases=['vol'])
     async def command_volume(self, ctx, volume: int=None):
-        """To [see|change] voice channel volume with prefix command"""
+        """To [see | change] voice channel volume with prefix command"""
         await ctx.reply(embed=(await self.music.volume(ctx, volume))[0])
 
     @slash_command(name='join')
@@ -81,7 +80,7 @@ class MusicCommands(commands.Cog, name='Music'):
         await ctx.respond(embed=(temp := (await self.music.leave(ctx)))[0], ephemeral=temp[1])
 
     @slash_command(name='play')
-    async def slash_play(self, ctx, name: Option(str, '[Name|Link] of the [video|playlist] you want to play')):
+    async def slash_play(self, ctx, name: Option(str, '[Name | Link] of the [video | playlist] you want to play')):
         """To play video in voice channel with slash command"""
         await ctx.defer()
         await ctx.respond(embed=(await self.music.play(ctx, name))[0])
@@ -129,7 +128,7 @@ class MusicCommands(commands.Cog, name='Music'):
 
     @slash_command(name='volume')
     async def slash_volume(self, ctx, volume: Option(int, 'New volume you want to use', required=False, default=None)):
-        """To [see|change] voice channel volume with slash command"""
+        """To [see | change] voice channel volume with slash command"""
         await ctx.respond(embed=(temp := (await self.music.volume(ctx, volume)))[0], ephemeral=temp[1])
 
 

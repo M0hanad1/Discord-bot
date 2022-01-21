@@ -6,7 +6,7 @@ from src.functions.functions import *
 
 
 class Mods:
-    def __init__(self, bot: discord.Bot) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.temp = 0
 
@@ -28,7 +28,7 @@ class Mods:
 
     async def kick(self, ctx, member: discord.Member, reason: str='No reason'):
         if member == ctx.author:
-            return (create_embeds(ctx, ('Error!\nYou can\'t kick yourself', '')), True)
+            return (create_embeds(ctx, ('You can\'t kick yourself', '')), True)
 
         await ctx.guild.kick(member, reason=reason)
         return (create_embeds(ctx, (f'Kicked from the server\nReason: {reason}', ''), (member.name, member_avatar(member))), False)
@@ -42,7 +42,7 @@ class Mods:
                 raise commands.MemberNotFound(str(member))
 
         if member == ctx.author:
-            return (create_embeds(ctx, ('Error!\nYou can\'t ban yourself', '')), True)
+            return (create_embeds(ctx, ('You can\'t ban yourself', '')), True)
 
         for i in await ctx.guild.bans():
             if member == i.user:
@@ -78,7 +78,7 @@ class Mods:
                 return (create_embeds(ctx, ('This member already muted', '')), True)
 
             if member == ctx.author:
-                return (create_embeds(ctx, ('Error!\nYou can\'t mute yourself', '')), True)
+                return (create_embeds(ctx, ('You can\'t mute yourself', '')), True)
 
             await member.timeout(discord.utils.utcnow() + datetime.timedelta(seconds=humanfriendly.parse_timespan(time)))
             return (create_embeds(ctx, (f'Has been muted\nTime: {time}\nReason: {reason}', ''), (member.name, member_avatar(member))), False)

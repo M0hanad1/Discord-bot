@@ -51,9 +51,9 @@ class Score:
         self.data = ScoreData()
         self.bot = bot
 
-    async def score(self, ctx, member):
+    async def score(self, ctx, member: discord.Member):
         member = await get_member(self.bot, ctx, member)
-        return create_embeds(ctx, (f'Score:\n{self.data.get_user_global(member.id)}', ''), (member.name, member_avatar(member)), embed_field=[(f'Server score:', f'**{self.data.get_user_local(ctx.guild.id, member.id)}**', False)])
+        return create_embeds(ctx, (f'Score:\n{self.data.get_user_global(member.id)}', ''), (member.name, member_avatar(member)), embed_field=[(f'Local score:', f'**{self.data.get_user_local(ctx.guild.id, member.id)}**', False)])
 
     def get_mood(self, mood):
         if mood == 'global' or mood == 'g' or mood == 'discord' or mood == 'd':
@@ -109,7 +109,7 @@ class Score:
                 all_local_message.append(local_message)
 
             if mood == 'local':
-                page = 1 if page > len(all_local_message) else page
+                page = 1 if (page > len(all_local_message) or page < 1) else page
                 return create_embeds(ctx, (f'Top guild score [{page} | {len(all_local_message)}]:', all_local_message[page-1]), (ctx.guild.name, server_avatar(ctx.guild)))
 
         if mood == 'both' or mood == 'global':
@@ -150,8 +150,8 @@ class Score:
                 all_global_message.append(global_message)
 
         if mood == 'global':
-            page = 1 if page > len(all_global_message) else page
-            return create_embeds(ctx, (f'Top discord score [{page} | {len(all_global_message)}]:', all_global_message[page-1]), ('Discord', r'https://www.bestappsforkids.com/wp-content/uploads/2021/10/Discord.png'))
+            page = 1 if (page > len(all_global_message) or page < 1) else page
+            return create_embeds(ctx, (f'Top global score [{page}/{len(all_global_message)}]:', all_global_message[page-1]), ('Global', 'https://www.bestappsforkids.com/wp-content/uploads/2021/10/Discord.png'))
 
         return create_embeds(ctx, ('Top score:', ''), (ctx.guild.name, server_avatar(ctx.guild)), embed_field=[('Local score:', local_message, True), ('Global score:', global_message, True)])
 

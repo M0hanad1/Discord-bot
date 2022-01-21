@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from requests import get
 from src.functions import *
+from string import digits
 
 
 class Main:
@@ -55,3 +56,17 @@ class Main:
 
     def ping(self, ctx):
         return create_embeds(ctx, (f'Your ping: {round(self.bot.latency * 1000)} ms', ''))
+
+    def calc(self, ctx, calculation):
+        for i in calculation.replace(' ', ''):
+            if i not in digits + '()./*+-':
+                return (create_embeds(ctx, ('Syntax error', '')), True)
+
+        try:
+            return (create_embeds(ctx, (f'Result:\n{eval(calculation)}', '')), False)
+
+        except ZeroDivisionError:
+            return (create_embeds(ctx, ('Zero division error\nCan\'t division by zero', '')), True)
+
+        except:
+            return (create_embeds(ctx, ('Syntax error', '')), True)

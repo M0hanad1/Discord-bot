@@ -9,7 +9,7 @@ class GamesCommands(commands.Cog, name='Games'):
         self.bot = bot
         self.games = Games(self.bot)
 
-    @commands.command(name='random')
+    @commands.command(name='random', aliases=['rand'])
     async def command_random(self, ctx):
         """Try to guess the random number"""
         await self.games.random(ctx, False)

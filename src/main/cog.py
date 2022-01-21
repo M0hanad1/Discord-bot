@@ -46,6 +46,11 @@ class MainCommands(commands.Cog, name='Main'):
         """To get emoji link with prefix command"""
         await ctx.reply(embed=self.main.get_emoji(ctx, emoji)[0])
 
+    @commands.command(name='calc')
+    async def command_calc(self, ctx, *, calculation: str):
+        """To calculate a calculation with prefix command"""
+        await ctx.reply(embed=self.main.calc(ctx, calculation)[0])
+
     @slash_command(name='info')
     async def slash_info(self, ctx):
         """To get information about the bot with slash command"""
@@ -87,6 +92,11 @@ class MainCommands(commands.Cog, name='Main'):
             emoji = await converter.convert(ctx, emoji)
 
         await ctx.respond(embed=(temp := self.main.get_emoji(ctx, emoji))[0], ephemeral=temp[1])
+
+    @slash_command(name='calc')
+    async def slash_calc(self, ctx, calculation: Option(str, 'Calculation you want to do')):
+        """To calculate a calculation with slash command"""
+        await ctx.respond(embed=(temp := self.main.calc(ctx, calculation))[0], ephemeral=temp[1])
 
 
 def setup(bot: commands.Bot):

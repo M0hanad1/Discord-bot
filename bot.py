@@ -1,14 +1,13 @@
 import discord
 import os
-from discord import commands
-from dotenv import load_dotenv
 from discord.ext import commands
+from dotenv import load_dotenv
 from src.prefix.prefix import Prefix
 
 
 load_dotenv()
 prefix = Prefix()
-bot = commands.Bot(activity=discord.Game(name='/help'), intents=discord.Intents.all(), command_prefix=prefix.get_prefix, case_insensitive=True, owner_id=589198370111881216)
+bot = commands.Bot(activity=discord.Game(name='+help'), intents=discord.Intents.all(), command_prefix=prefix.get_prefix)
 
 
 @bot.event

@@ -222,9 +222,9 @@ class Music:
         if len(message) > 0:
             all_messages.append(message)
 
-        page = 1 if page > len(all_messages) else page
+        page = 1 if (page > len(all_messages) or page < 1) else page
 
-        return (create_embeds(ctx, (f'Queue [{page} | {len(all_messages)}]:', all_messages[page-1])), False)
+        return (create_embeds(ctx, (f'Queue [{page}/{len(all_messages)}]:', all_messages[page-1])), False)
 
     async def remove(self, ctx, index):
         if index == 1:
@@ -243,7 +243,7 @@ class Music:
         vc = ctx.voice_client
 
         if not vc.is_playing():
-            return (create_embeds(ctx, ('There\'s nothing playing to change the volume', '')), True)
+            return (create_embeds(ctx, ('There\'s nothing playing to [get | change] the volume', '')), True)
 
         if volume is None:
             return (create_embeds(ctx, (f'The current volume is: {int(vc.source.volume * 100)}%', '')), False)

@@ -1,4 +1,3 @@
-import discord
 from discord.ext import commands
 from discord.commands import slash_command, Option
 from src.prefix.prefix import Prefix
@@ -7,7 +6,7 @@ from src.functions.functions import *
 
 class PrefixCommands(commands.Cog, name='Prefix'):
     """Prefix commands"""
-    def __init__(self, bot: discord.Bot) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.data = Prefix()
 
@@ -33,14 +32,14 @@ class PrefixCommands(commands.Cog, name='Prefix'):
 
     @commands.command(name='prefix', aliases=['setpre'])
     async def command_prefix(self, ctx, new_prefix: str=None):
-        """To [see|change] the prefix with prefix command"""
+        """To [see | change] the prefix with prefix command"""
         await ctx.reply(embed=self.prefix(ctx, new_prefix)[0])
 
-    @slash_command(name='prefix', guild_ids=[787082535553335337])
+    @slash_command(name='prefix')
     async def slash_prefix(self, ctx, new_prefix: Option(str, 'New prefix you want to have', required=False, default=None)):
-        """To [see|change] the prefix with slash command"""
+        """To [see | change] the prefix with slash command"""
         await ctx.respond(embed=(temp := self.prefix(ctx, new_prefix))[0], ephemeral=temp[1])
 
 
-def setup(bot: discord.Bot):
+def setup(bot: commands.Bot):
     bot.add_cog(PrefixCommands(bot))
