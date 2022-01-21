@@ -1,1 +1,1 @@
-from src.score.score import ScoreData
+from src.score.score import Score

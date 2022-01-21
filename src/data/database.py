@@ -34,11 +34,3 @@ class Database:
             return True
 
         return False
-
-
-# data = Database('localhost', 'discord-bot')
-# data.add_collection('servers', 'users')
-# test = data.find_post('users', {'score': {'$exists': True}})
-
-# for i in test:
-#     print(i['_id'], i['score'])

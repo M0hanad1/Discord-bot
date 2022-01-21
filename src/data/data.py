@@ -26,6 +26,9 @@ class Data:
     def get_user(self, value: dict):
         return self.data.find_post(self.users, value)
 
+    def get_all_users(self):
+        return self.data.find_post(self.users, {})
+
     def add_server(self, *values: dict):
         self.data.add_post(self.servers, values)
 
@@ -36,7 +39,15 @@ class Data:
         self.data.update_post(self.servers, value, new_value)
 
     def check_server(self, value: dict):
-        self.data.check_post(self.servers, value)
+        return self.data.check_post(self.servers, value)
 
     def get_server(self, value: dict):
         return self.data.find_post(self.servers, value)
+
+    def get_all_servers(self):
+        return self.data.find_post(self.servers, {})
+
+    def check_server_len(self, server_id):
+        for i in self.get_server({'_id': server_id}):
+            if len(i) == 1:
+                self.remove_server({'_id': server_id})

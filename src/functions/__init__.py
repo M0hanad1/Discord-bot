@@ -1,1 +1,1 @@
-from src.functions.functions import Functions
+from src.functions.functions import *

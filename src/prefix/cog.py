@@ -1,0 +1,46 @@
+import discord
+from discord.ext import commands
+from discord.commands import slash_command, Option
+from src.prefix.prefix import Prefix
+from src.functions.functions import *
+
+
+class PrefixCommands(commands.Cog, name='Prefix'):
+    """Prefix commands"""
+    def __init__(self, bot: discord.Bot) -> None:
+        self.bot = bot
+        self.data = Prefix()
+
+    def prefix(self, ctx, new_prefix):
+        if new_prefix is None:
+            return (create_embeds(ctx, (f'The current prefix is: {self.data.prefix(ctx)}', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
+
+        if not ctx.author.guild_permissions.administrator:
+            raise commands.MissingPermissions(['Administrator'])
+
+        if len(new_prefix) > 5:
+            return (create_embeds(ctx, (f'The prefix length should be less than or equal 5 characters', ''), (ctx.guild.name, server_avatar(ctx.guild))), True)
+
+        if new_prefix == '/':
+            return (create_embeds(ctx, (f'The prefix can\'t be a slash (/)', ''), (ctx.guild.name, server_avatar(ctx.guild))), True)
+
+        prefix = self.data.update_prefix(ctx, new_prefix)
+
+        if prefix is None:
+            return (create_embeds(ctx, (f'That\'s the same current prefix', ''), (ctx.guild.name, server_avatar(ctx.guild))), True)
+
+        return (create_embeds(ctx, (f'Prefix changed successfully\nold prefix: {prefix[0]}\nNew prefix: {prefix[1]}', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
+
+    @commands.command(name='prefix', aliases=['setpre'])
+    async def command_prefix(self, ctx, new_prefix: str=None):
+        """To [see|change] the prefix with prefix command"""
+        await ctx.reply(embed=self.prefix(ctx, new_prefix)[0])
+
+    @slash_command(name='prefix', guild_ids=[787082535553335337])
+    async def slash_prefix(self, ctx, new_prefix: Option(str, 'New prefix you want to have', required=False, default=None)):
+        """To [see|change] the prefix with slash command"""
+        await ctx.respond(embed=(temp := self.prefix(ctx, new_prefix))[0], ephemeral=temp[1])
+
+
+def setup(bot: discord.Bot):
+    bot.add_cog(PrefixCommands(bot))
