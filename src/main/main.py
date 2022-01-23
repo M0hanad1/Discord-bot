@@ -1,8 +1,11 @@
 import discord
 from discord.ext import commands
 from requests import get
-from src.functions import *
+from bs4 import BeautifulSoup
+from src.functions import create_embeds, member_avatar, get_banner, server_avatar
 from string import digits
+from googlesearch import search
+from urllib.request import urlopen
 
 
 class Main:
@@ -70,3 +73,14 @@ class Main:
 
         except:
             return (create_embeds(ctx, ('Syntax error', '')), True)
+
+    def search(self, ctx, item):
+        result = search(item, safe='on', num=1)
+
+        for i in result:
+            soup = BeautifulSoup(get(i).text, 'html.parser')
+            title = soup.title.string
+            desc = soup.find('meta', attrs={'name': 'description'})
+            return (create_embeds(ctx, ('Result:', f'**[Website url]({i})**'), embed_field=[('Title:', f'**[{title}]({i})**' if title else '**No title found**', False), ('Description:', f'```\n{desc["content"]}```' if desc else '```\nNo description found```', False)]), False)
+
+        return (create_embeds(ctx, ('No result found', '')), True)

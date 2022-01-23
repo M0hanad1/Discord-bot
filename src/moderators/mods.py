@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import datetime
 import humanfriendly
-from src.functions.functions import *
+from src.functions.functions import create_embeds, member_avatar, server_avatar
 
 
 class Mods:

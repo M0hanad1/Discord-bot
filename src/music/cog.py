@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord.commands import slash_command, Option
 from src.music.music import Music
-from src.functions.functions import *
+from src.functions.functions import create_embeds
 
 
 class MusicCommands(commands.Cog, name='Music'):

@@ -2,7 +2,6 @@ import discord
 from discord.commands import Option, slash_command
 from discord.ext import commands
 from src.score.score import Score
-from src.functions.functions import *
 
 
 class ScoreCommands(commands.Cog, name='Score'):
@@ -17,7 +16,7 @@ class ScoreCommands(commands.Cog, name='Score'):
         await ctx.reply(embed=self.data.top(ctx, self.data.get_mood(mood.lower()), page))
 
     @commands.command(name='score')
-    async def command_score(self, ctx, *, member: str=None):
+    async def command_score(self, ctx, *, member: discord.Member=None):
         """To get [your | member] score with prefix command"""
         await ctx.reply(embed=await self.data.score(ctx, member))
 

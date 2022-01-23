@@ -32,12 +32,12 @@ class GamesCommands(commands.Cog, name='Games'):
     @slash_command(name='fast')
     async def slash_fast(self, ctx, lang: Option(str, 'Language you want to use', choices=['English', 'Arabic', 'Random'], required=False, default='random')):
         """Try to type the word as fast as you can"""
-        await self.games.typing_games(ctx, lang.lower(), 'fast', True)
+        await self.games.typing_games(ctx, lang, 'fast', True)
 
     @slash_command(name='spell')
-    async def slash_dis(self, ctx, lang: Option(str, 'Language you want to use', choices=['English', 'Arabic', 'Random'], required=False, default='random')):
+    async def slash_spell(self, ctx, lang: Option(str, 'Language you want to use', choices=['English', 'Arabic', 'Random'], required=False, default='random')):
         """Try to spell the word as fast as you can"""
-        await self.games.typing_games(ctx, lang, 'dis', True)
+        await self.games.typing_games(ctx, lang, 'spell', True)
 
 
 def setup(bot: commands.Bot):

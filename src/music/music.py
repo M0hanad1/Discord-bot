@@ -4,7 +4,7 @@ import asyncio
 from time import gmtime
 from requests import get
 from discord.ext import commands
-from src.functions.functions import *
+from src.functions.functions import create_embeds
 
 
 class Music:
@@ -99,7 +99,7 @@ class Music:
 
         with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
             try:
-                if get(item, allow_redirects=False).status_code == 302:
+                if get('https://www.youtube.com/oembed?url=' + item).status_code != 200:
                     raise
 
                 info = ydl.extract_info(item, download=False)
@@ -108,8 +108,11 @@ class Music:
                 try:
                     info = ydl.extract_info(f"ytsearch:{item}", download=False)['entries'][0]
 
+                    if info is None:
+                        raise
+
                 except:
-                    return (create_embeds(ctx, ('I can\'t find this video', '')), True)
+                    return (create_embeds(ctx, ('There\'s no result found', '')), True)
 
             if 'entries' in info:
                 return (await self.add_playlist(ctx, vc, info), False)

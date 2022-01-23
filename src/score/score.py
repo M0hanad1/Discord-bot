@@ -1,6 +1,6 @@
 import discord
 from src.data.data import Data
-from src.functions.functions import *
+from src.functions.functions import create_embeds, member_avatar, server_avatar
 from discord.ext import commands
 
 
@@ -52,7 +52,7 @@ class Score:
         self.bot = bot
 
     async def score(self, ctx, member: discord.Member):
-        member = await get_member(self.bot, ctx, member)
+        member = ctx.author if member is None else member
         return create_embeds(ctx, (f'Score:\n{self.data.get_user_global(member.id)}', ''), (member.name, member_avatar(member)), embed_field=[(f'Local score:', f'**{self.data.get_user_local(ctx.guild.id, member.id)}**', False)])
 
     def get_mood(self, mood):
@@ -97,7 +97,7 @@ class Score:
                     if len(local_message) == 0 and i > message_author[1]-1:
                         local_message += f'**{message_author[1]}- <@{message_author[0]}>: {message_author[2]}**\n'
 
-                    local_message += f'{i+1}- <@{j}>: {temp_local[j]}\n'
+                    local_message += f'{i+1}- <@{j}>: `{temp_local[j]}`\n'
 
             if len(local_message) > 0 or message_author[0] not in local_message:
                 if message_author[0] not in local_message:
@@ -110,7 +110,7 @@ class Score:
 
             if mood == 'local':
                 page = 1 if (page > len(all_local_message) or page < 1) else page
-                return create_embeds(ctx, (f'Top guild score [{page} | {len(all_local_message)}]:', all_local_message[page-1]), (ctx.guild.name, server_avatar(ctx.guild)))
+                return create_embeds(ctx, (f'Top guild score [{page}/{len(all_local_message)}]:', all_local_message[page-1]), (ctx.guild.name, server_avatar(ctx.guild)))
 
         if mood == 'both' or mood == 'global':
             temp_global = dict(sorted(self.data.get_all_global().items(), key=lambda item: item[1], reverse=True))
@@ -138,7 +138,7 @@ class Score:
                     if len(global_message) == 0 and i > message_author[1]-1:
                         global_message += f'**{message_author[1]}- <@{message_author[0]}>: {message_author[2]}**\n'
 
-                    global_message += f'{i+1}- <@{j}>: {temp_global[j]}\n'
+                    global_message += f'{i+1}- <@{j}>: `{temp_global[j]}`\n'
 
             if len(global_message) > 0 or message_author[0] not in global_message:
                 if message_author[0] not in global_message:

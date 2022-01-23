@@ -5,7 +5,7 @@ from discord.ext import commands
 from asyncio import TimeoutError
 from discord.ui import View
 from src.score.score import Score
-from src.functions.functions import *
+from src.functions.functions import create_embeds, create_image, arabic_convert, member_avatar
 
 
 class RandomView(View):
@@ -126,7 +126,36 @@ class Games:
         self.img_path = self.assets_path + 'img/'
         self.data = Score(self.bot)
 
+    def temp_check(self, ctx):
+        server_id = ctx.guild.id
+        channel_id = ctx.channel.id
+
+        if server_id not in self.temp:
+            self.temp[server_id] = []
+
+        if channel_id not in self.temp[server_id]:
+            self.temp[server_id].append(channel_id)
+            return False
+
+        return True
+
+    def temp_remove(self, ctx):
+        server_id = ctx.guild.id
+        channel_id = ctx.channel.id
+
+        self.temp[server_id].remove(channel_id)
+
+        if len(self.temp[server_id]) == 0:
+            del self.temp[server_id]
+
     async def typing_games(self, ctx, lang, game, mood):
+        if self.temp_check(ctx):
+            if mood:
+                return await ctx.respond(embed=create_embeds(ctx, ('There\'s already a game in this channel', '')), ephemeral=True)
+
+            return await ctx.reply(embed=create_embeds(ctx, ('There\'s already a game in this channel', '')))
+
+        lang = lang.lower()
         lang_files = [f'{self.words_path}english_words.txt', f'{self.words_path}arabic_words.txt']
 
         if lang == 'en' or lang == 'english':
@@ -147,7 +176,7 @@ class Games:
             else:
                 create_image(word, self.img_path + 'temp_img.png')
 
-        file, embed = discord.File(f'{self.img_path}temp_img.png', filename='img.png'), create_embeds(ctx, embed_image='attachment://img.png')
+        file, embed = discord.File(f'{self.img_path}temp_img.png', filename='img.png'), create_embeds(ctx, (f'Try to {"write" if game == "fast" else "spell"}:', ''), embed_image='attachment://img.png')
 
         if mood:
             temp = await ctx.respond(file=file, embed=embed)
@@ -160,13 +189,16 @@ class Games:
 
         try:
             message = await self.bot.wait_for('message', check= lambda msg: (game == 'fast' and msg.content.lower() == word) or (game == 'spell' and msg.content.lower().strip() == ' '.join([i for i in word])), timeout=6 if game == 'fast' else 8)
+            result = str(time.time() - start)[:4]
             await message.add_reaction('<a:yes:931522286383693905>')
-            await message.reply(embed=create_embeds(ctx, (f'You Won\nYou took {str(time.time() - start)[:4]}', ''), embed_author=(message.author.name, member_avatar(message.author)), embed_footer=('', '')))
+            await message.reply(embed=create_embeds(ctx, (f'You Won\nYou took {result}', ''), embed_author=(message.author.name, member_avatar(message.author)), embed_footer=('', '')))
             self.data.upgrade_score(ctx, message.author)
 
         except TimeoutError:
             embed = create_embeds(ctx, (f'Time out\nNo one get it', ''), embed_footer=('', ''))
             await temp.reply(embed=embed)
+
+        self.temp_remove(ctx)
 
     async def random(self, ctx, mood):
         view = RandomView(ctx, mood)

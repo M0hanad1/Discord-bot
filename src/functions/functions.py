@@ -45,30 +45,6 @@ def arabic_convert(string):
     return reshape(string)
 
 
-def temp_check(temp, ctx):
-    server_id = ctx.guild.id
-    channel_id = ctx.channel.id
-
-    if server_id not in temp:
-        temp[server_id] = []
-
-    if channel_id not in temp[server_id]:
-        temp[server_id].append(channel_id)
-        return False
-
-    return True
-
-
-def temp_remove(temp, ctx):
-    server_id = ctx.guild.id
-    channel_id = ctx.channel.id
-
-    temp[server_id].remove(channel_id)
-
-    if len(temp[server_id]) == 0:
-        del temp[server_id]
-
-
 def member_avatar(member: discord.Member):
     try:
         avatar = member.avatar.url
@@ -87,26 +63,6 @@ def server_avatar(server: discord.Guild):
         icon = ''
 
     return icon
-
-
-async def get_member(bot, ctx, member):
-    try:
-        if member is not None:
-            converter = commands.MemberConverter()
-
-            try:
-                member = await converter.convert(ctx, member)
-
-            except:
-                member = await bot.fetch_user(int(member))
-
-        else:
-            member = ctx.author
-
-    except:
-        raise commands.MemberNotFound(member)
-
-    return member
 
 
 async def get_banner(bot, member):

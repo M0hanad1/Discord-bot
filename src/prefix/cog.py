@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord.commands import slash_command, Option
 from src.prefix.prefix import Prefix
-from src.functions.functions import *
+from src.functions.functions import create_embeds, server_avatar
 
 
 class PrefixCommands(commands.Cog, name='Prefix'):

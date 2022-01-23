@@ -1,12 +1,13 @@
 import discord
 from discord.commands import slash_command, Option
 from discord.ext import commands
+from src.functions.functions import create_embeds
 from src.main.main import Main
 from typing import Union
 
 
-class MainCommands(commands.Cog, name='Main'):
-    """Main commands"""
+class MainCommands(commands.Cog, name='Global'):
+    """Global commands"""
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.main = Main(self.bot)
@@ -50,6 +51,12 @@ class MainCommands(commands.Cog, name='Main'):
     async def command_calc(self, ctx, *, calculation: str):
         """To calculate a calculation with prefix command"""
         await ctx.reply(embed=self.main.calc(ctx, calculation)[0])
+
+    @commands.command(name='search')
+    async def command_search(self, ctx, *, item: str):
+        """To search for something in google with prefix command"""
+        temp = await ctx.reply(embed=create_embeds(ctx, ('Searching...', '')))
+        await temp.edit(embed=self.main.search(ctx, item)[0])
 
     @slash_command(name='info')
     async def slash_info(self, ctx):
@@ -97,6 +104,12 @@ class MainCommands(commands.Cog, name='Main'):
     async def slash_calc(self, ctx, calculation: Option(str, 'Calculation you want to do')):
         """To calculate a calculation with slash command"""
         await ctx.respond(embed=(temp := self.main.calc(ctx, calculation))[0], ephemeral=temp[1])
+
+    @slash_command(name='search')
+    async def slash_search(self, ctx, item: Option(str, 'Item you want to search for')):
+        """To search for something in google with slash command"""
+        await ctx.defer()
+        await ctx.respond(embed=(temp := self.main.search(ctx, item))[0], ephemeral=temp[1])
 
 
 def setup(bot: commands.Bot):
