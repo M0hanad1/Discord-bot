@@ -10,8 +10,8 @@ from src.functions.functions import create_embeds
 class Music:
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.queue = []
-        self.temp = None
+        self.queue = {}
+        self.temp = {}
         self.vol = 1.0
         self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 
@@ -38,19 +38,22 @@ class Music:
     def play_next(self, ctx):
         vc = ctx.voice_client
 
-        if self.temp is not None and self.temp[-1]:
-            self.start(ctx, vc, self.temp[0])
-            return
+        if (check := ctx.guild.id in self.temp) and self.temp[ctx.guild.id][-1]:
+            return self.start(ctx, vc, self.temp[ctx.guild.id][0])
 
-        if len(self.queue) > 0:
-            info = self.queue.pop(0)
+        if ctx.guild.id in self.queue and len(self.queue[ctx.guild.id]) > 0:
+            info = self.queue[ctx.guild.id].pop(0)
+
+            if len(self.queue[ctx.guild.id]) == 0:
+                del self.queue[ctx.guild.id]
 
             self.start(ctx, vc, info)
-            self.temp = [info, False]
-            asyncio.run_coroutine_threadsafe(ctx.channel.send(embed=create_embeds(ctx, (f'Now playing:', f'**[{info["title"]}]({info["webpage_url"]})**\n**(`{self.get_time(info["duration"])}`)**'), embed_image=info['thumbnail'])), self.bot.loop)
-            return
+            self.temp[ctx.guild.id] = [info, False]
+            return asyncio.run_coroutine_threadsafe(ctx.channel.send(embed=create_embeds(ctx, (f'Now playing:', f'**[{info["title"]}]({info["webpage_url"]})**\n**(`{self.get_time(info["duration"])}`)**'), embed_image=info['thumbnail'])), self.bot.loop)
 
-        self.temp = None
+        if check:
+            del self.temp[ctx.guild.id]
+
         asyncio.run_coroutine_threadsafe(ctx.channel.send(embed=create_embeds(ctx, ('No more songs', '')), delete_after=15), self.bot.loop)
 
     def check(self, ctx, vc, bot_vc, mood=None):
@@ -77,6 +80,12 @@ class Music:
 
         try:
             await vc.channel.connect()
+
+            if ctx.guild.id in self.temp:
+                del self.temp[ctx.guild.id]
+
+            if ctx.guild.id in self.queue:
+                del self.queue[ctx.guild.id]
 
         except:
             await ctx.voice_client.move_to(vc.channel)
@@ -118,23 +127,29 @@ class Music:
                 return (await self.add_playlist(ctx, vc, info), False)
 
             if vc.is_playing() or vc.is_paused():
-                self.queue.append(info)
+                if ctx.guild.id not in self.queue:
+                    self.queue[ctx.guild.id] = []
+
+                self.queue[ctx.guild.id].append(info)
                 return (create_embeds(ctx, (f'Added to queue:', f'**[{info["title"]}]({info["webpage_url"]})**\n**(`{self.get_time(info["duration"])}`)**'), embed_image=info['thumbnail']), False)
 
+            self.temp[ctx.guild.id] = [info, False]
             self.start(ctx, vc, info)
-            self.temp = [info, False]
             return (create_embeds(ctx, (f'Now playing:', f'**[{info["title"]}]({info["webpage_url"]})**\n**(`{self.get_time(info["duration"])}`)**'), embed_image=info['thumbnail']), False)
 
     async def add_playlist(self, ctx, vc, info):
-        if vc.is_playing() or vc.is_paused():
-            self.queue.append(info['entries'][0])
+        if ctx.guild.id not in self.queue:
+            self.queue[ctx.guild.id] = []
 
-        [self.queue.append(info['entries'][i]) for i in range(1, len(info['entries']))]
+        if vc.is_playing() or vc.is_paused():
+            self.queue[ctx.guild.id].append(info['entries'][0])
+
+        [self.queue[ctx.guild.id].append(info['entries'][i]) for i in range(1, len(info['entries']))]
         embed = create_embeds(ctx, (f'Playlist added to queue:', f'**[{info["title"]}]({info["webpage_url"]})**\n**(`{len(info["entries"])}`)**'), embed_image=info['entries'][0]["thumbnail"])
 
         if not vc.is_playing() and not vc.is_paused():
+            self.temp[ctx.guild.id] = [info['entries'][0], False]
             self.start(ctx, vc, info['entries'][0])
-            self.temp = [info['entries'][0], False]
             embed.add_field(name='Now playing:', value=f'**[{info["entries"][0]["title"]}]({info["entries"][0]["webpage_url"]})**\n**(`{self.get_time(info["entries"][0]["duration"])}`)**')
 
         return embed
@@ -172,8 +187,11 @@ class Music:
         if not vc.is_playing() and not vc.is_paused():
             return (create_embeds(ctx, ('There\'s nothing playing to stop', '')), True)
 
-        self.temp = None
-        self.queue = []
+        del self.temp[ctx.guild.id]
+
+        if ctx.guild.id in self.queue:
+            del self.queue[ctx.guild.id]
+
         vc.stop()
         return (create_embeds(ctx, ('Voice has been stopped', '')), False)
 
@@ -186,7 +204,7 @@ class Music:
         if not vc.is_playing() and not vc.is_paused():
             return (create_embeds(ctx, ('There\'s nothing playing to skip', '')), True)
 
-        self.temp[-1] = False
+        self.temp[ctx.guild.id][-1] = False
         vc.stop()
 
     async def loop(self, ctx):
@@ -198,29 +216,30 @@ class Music:
         if not vc.is_playing() and not vc.is_paused():
             return (create_embeds(ctx, ('There\'s nothing playing to loop', '')), True)
 
-        self.temp[-1] = True if not self.temp[-1] else False
-        temp = 'Looping:' if self.temp[-1] else 'Not looping:'
-        return (create_embeds(ctx, (temp, f'**[{self.temp[0]["title"]}]({self.temp[0]["webpage_url"]})**')), False)
+        self.temp[ctx.guild.id][-1] = True if not self.temp[ctx.guild.id][-1] else False
+        temp = 'Looping:' if self.temp[ctx.guild.id][-1] else 'Not looping:'
+        return (create_embeds(ctx, (temp, f'**[{self.temp[ctx.guild.id][0]["title"]}]({self.temp[ctx.guild.id][0]["webpage_url"]})**')), False)
 
     async def queue_display(self, ctx, page):
         if not ((temp := self.check(ctx, ctx.author.voice,  ctx.guild.me.voice))[0]):
             return (temp[1], True)
 
-        if self.temp is None:
+        if ctx.guild.id not in self.temp:
             return (create_embeds(ctx, ('There\'s no songs', '')), True)
 
-        message = f'**1:**\n**[{self.temp[0]["title"]}]({self.temp[0]["webpage_url"]})**\n'
-        message += '**(`Looping`)**\n\n' if self.temp[-1] else '\n'
+        message = f'**1:**\n**[{self.temp[ctx.guild.id][0]["title"]}]({self.temp[ctx.guild.id][0]["webpage_url"]})**\n'
+        message += '`Looping`\n\n' if self.temp[ctx.guild.id][-1] else '\n'
         all_messages = []
         num = 1
 
-        for i in self.queue:
-            if ((num / 5) - (num // 5)) == 0:
-                all_messages.append(message)
-                message = ''
+        if ctx.guild.id in self.queue:
+            for i in self.queue[ctx.guild.id]:
+                if ((num / 5) - (num // 5)) == 0:
+                    all_messages.append(message)
+                    message = ''
 
-            message += f'**{num+1}:**\n**[{i["title"]}]({i["webpage_url"]})**\n\n'
-            num += 1
+                message += f'**{num+1}:**\n**[{i["title"]}]({i["webpage_url"]})**\n\n'
+                num += 1
 
         if len(message) > 0:
             all_messages.append(message)
@@ -230,13 +249,16 @@ class Music:
         return (create_embeds(ctx, (f'Queue [{page}/{len(all_messages)}]:', all_messages[page-1])), False)
 
     async def remove(self, ctx, index):
+        if not ((temp := self.check(ctx, ctx.author.voice,  ctx.guild.me.voice))[0]):
+            return (temp[1], True)
+
         if index == 1:
             return (create_embeds(ctx, (f'You already listening to this song', 'Try to use `skip` command')), True)
 
-        if index-1 > len(self.queue) or index < 1:
+        if ctx.guild.id not in self.queue or index-1 > len(self.queue[ctx.guild.id]) or index < 1:
             return (create_embeds(ctx, (f'There\'s no song with this index in the queue', '')), True)
 
-        temp = self.queue.pop(index-2)['title']
+        temp = self.queue[ctx.guild.id].pop(index-2)['title']
         return (create_embeds(ctx, (f'Song removed successfully from the queue:', f'`{temp}`')), False)
 
     async def volume(self, ctx, volume):

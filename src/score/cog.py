@@ -28,7 +28,7 @@ class ScoreCommands(commands.Cog, name='Score'):
     @slash_command(name='top')
     async def slash_top(self, ctx, mood: Option(str, 'Choose to display [Global | Local | Both] score', choices=['Global', 'Local', 'Both'], required=False, default='both'), page: Option(int, 'Page you want to display', required=False, default=1)):
         """To get top [global | local | both] score with prefix command"""
-        await ctx.respond(embed=self.data.top(ctx, self.data.get_mood(mood.lower()), page))
+        await ctx.respond(embed=self.data.top(ctx, mood.lower(), page))
 
 
 def setup(bot: commands.Bot):
