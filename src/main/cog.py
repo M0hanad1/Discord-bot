@@ -126,7 +126,7 @@ class MainCommands(commands.Cog, name='Global'):
         '''To get server icon'''
         await ctx.respond(embed=(temp := self.main.icon(ctx))[0], ephemeral=temp[1])
 
-    @slash_command(name='translate', guild_ids=[934444583998353489])
+    @slash_command(name='translate')
     async def slash_trans(self, ctx, text: Option(str, 'Text you want to convert from'), from_: Option(str, 'Language you want to translate from', required='False', default='auto', name='from'), to: Option(str, 'Language you want to translate to', required=False, default=None)):
         '''To translate text'''
         await ctx.respond(embed=(temp := self.main.trans(ctx, text, from_, to))[0], ephemeral=temp[1])
