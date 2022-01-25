@@ -63,6 +63,11 @@ class MainCommands(commands.Cog, name='Global'):
         '''To get server icon'''
         await ctx.reply(embed=self.main.icon(ctx)[0])
 
+    @commands.command(name='translate', aliases=['trans'])
+    async def command_trans(self, ctx, *, text):
+        '''To translate text'''
+        await ctx.reply(embed=self.main.trans(ctx, text)[0])
+
     @slash_command(name='info')
     async def slash_info(self, ctx):
         '''To get information about the bot'''
@@ -120,6 +125,11 @@ class MainCommands(commands.Cog, name='Global'):
     async def slash_icon(self, ctx):
         '''To get server icon'''
         await ctx.respond(embed=(temp := self.main.icon(ctx))[0], ephemeral=temp[1])
+
+    @slash_command(name='translate', guild_ids=[934444583998353489])
+    async def slash_trans(self, ctx, text: Option(str, 'Text you want to convert from'), from_: Option(str, 'Language you want to translate from', required='False', default='auto', name='from'), to: Option(str, 'Language you want to translate to', required=False, default=None)):
+        '''To translate text'''
+        await ctx.respond(embed=(temp := self.main.trans(ctx, text, from_, to))[0], ephemeral=temp[1])
 
 
 def setup(bot: commands.Bot):

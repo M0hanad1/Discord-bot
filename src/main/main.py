@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from src.functions import create_embeds, member_avatar, get_banner, server_avatar
 from string import digits
 from googlesearch import search
+from googletrans import Translator
 
 
 class Main:
@@ -79,9 +80,10 @@ class Main:
         for i in result:
             soup = BeautifulSoup(get(i).text, 'html.parser')
             title = soup.title.string
+            title = title if title else soup.find('title')
             desc = soup.find('meta', attrs={'name': 'description'})
             desc = desc if desc else soup.find('meta', property='og:description')
-            return (create_embeds(ctx, ('Result:', f'**[Website]({i})**'), embed_field=[('Title:', f'**[{title}]({i})**' if title else '**No title found**', False), ('Description:', f'```\n{desc["content"]}```' if desc else '**No description found***', False)]), False)
+            return (create_embeds(ctx, ('Result:', f'**[Website]({i})**'), embed_field=[('Title:', f'**[{title}]({i})**' if title else '**No title found**', False), ('Description:', f'```\n{desc["content"]}```' if desc else '**No description found**', False)]), False)
 
         return (create_embeds(ctx, ('No result found', '')), True)
 
@@ -90,3 +92,14 @@ class Main:
             return (create_embeds(ctx, ('This server has no icon', '')), True)
 
         return (create_embeds(ctx, ('', f'**[Icon Link]({icon})**'), (ctx.guild.name, icon), embed_image=icon), False)
+
+    def trans(self, ctx, text, from_='auto', to=None):
+        to = to if to else ctx.guild.preferred_locale.split('-')[0]
+
+        try:
+            result = Translator().translate(text, dest=to, src=from_)
+
+        except ValueError:
+            return (create_embeds(ctx, ('I can\'t find this language', '**Send a valid [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code**')), True)
+
+        return (create_embeds(ctx, embed_field=[(f'From ({result.src}):', f'```\n{result.origin}```', False), (f'To ({result.dest}):', f'```\n{result.text}```', False)]), False)
