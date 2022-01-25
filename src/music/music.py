@@ -258,8 +258,8 @@ class Music:
         if ctx.guild.id not in self.queue or index-1 > len(self.queue[ctx.guild.id]) or index < 1:
             return (create_embeds(ctx, (f'There\'s no song with this index in the queue', '')), True)
 
-        temp = self.queue[ctx.guild.id].pop(index-2)['title']
-        return (create_embeds(ctx, (f'Song removed successfully from the queue:', f'`{temp}`')), False)
+        temp = self.queue[ctx.guild.id].pop(index-2)
+        return (create_embeds(ctx, (f'Song removed successfully from the queue:', f'**[{temp["title"]}]({temp["webpage_url"]})**')), False)
 
     async def volume(self, ctx, volume):
         if not ((temp := self.check(ctx, ctx.author.voice,  ctx.guild.me.voice))[0]):
@@ -267,7 +267,7 @@ class Music:
 
         vc = ctx.voice_client
 
-        if not vc.is_playing():
+        if not vc.is_playing() and not vc.is_paused():
             return (create_embeds(ctx, ('There\'s nothing playing to [get | change] the volume', '')), True)
 
         if volume is None:

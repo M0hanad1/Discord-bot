@@ -5,7 +5,7 @@ from src.functions.functions import create_embeds, server_avatar
 
 
 class PrefixCommands(commands.Cog, name='Prefix'):
-    """Prefix commands"""
+    '''Prefix commands'''
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.data = Prefix()
@@ -32,12 +32,12 @@ class PrefixCommands(commands.Cog, name='Prefix'):
 
     @commands.command(name='prefix', aliases=['setpre'])
     async def command_prefix(self, ctx, new_prefix: str=None):
-        """To [see | change] the prefix with prefix command"""
+        '''To [see | change] the prefix'''
         await ctx.reply(embed=self.prefix(ctx, new_prefix)[0])
 
     @slash_command(name='prefix')
     async def slash_prefix(self, ctx, new_prefix: Option(str, 'New prefix you want to have', required=False, default=None)):
-        """To [see | change] the prefix with slash command"""
+        '''To [see | change] the prefix'''
         await ctx.respond(embed=(temp := self.prefix(ctx, new_prefix))[0], ephemeral=temp[1])
 
 

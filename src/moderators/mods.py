@@ -1,6 +1,7 @@
 import discord
+from discord.errors import HTTPException
 from discord.ext import commands
-import datetime
+from datetime import timedelta
 import humanfriendly
 from src.functions.functions import create_embeds, member_avatar, server_avatar
 
@@ -38,7 +39,7 @@ class Mods:
             member = await self.bot.fetch_user(int(member))
 
         except:
-            if type(member) == int:
+            if isinstance(member, int):
                 raise commands.MemberNotFound(str(member))
 
         if member == ctx.author:
@@ -72,7 +73,7 @@ class Mods:
 
         raise commands.MemberNotFound(member)
 
-    async def mute(self, ctx, member: discord.Member, time, reason, mood):
+    async def mute(self, ctx, member: discord.Member, time=None, reason='No reason', mood=True):
         if mood:
             if member.timed_out:
                 return (create_embeds(ctx, ('This member already muted', '')), True)
@@ -80,8 +81,19 @@ class Mods:
             if member == ctx.author:
                 return (create_embeds(ctx, ('You can\'t mute yourself', '')), True)
 
-            await member.timeout(discord.utils.utcnow() + datetime.timedelta(seconds=humanfriendly.parse_timespan(time)))
-            return (create_embeds(ctx, (f'Has been muted\nTime: {time}\nReason: {reason}', ''), (member.name, member_avatar(member))), False)
+            try:
+                time_temp = timedelta(seconds=humanfriendly.parse_timespan(time))
+
+            except:
+                return (create_embeds(ctx, ('Unavailable time format', '')), True)
+
+            try:
+                await member.timeout(discord.utils.utcnow() + time_temp)
+
+            except HTTPException:
+                return (create_embeds(ctx, ('Mute time should be less than or equal to 28 day', '')), True)
+
+            return (create_embeds(ctx, (f'Has been muted\nTime: {humanfriendly.format_timespan(time_temp)}\nReason: {reason}', ''), (member.name, member_avatar(member))), False)
 
         if not member.timed_out:
             return (create_embeds(ctx, ('This member\'s not muted', '')), True)
@@ -160,3 +172,21 @@ class Mods:
             mood = 'added'
 
         return (create_embeds(ctx, (f'Role {mood} successfully', ''), (member.name, member_avatar(member)), embed_field=[('Member:', member.mention, False), ('Role:', role.mention, False), ('Reason', reason, False)]), False)
+
+    async def slowmode(self, ctx, time: str, reason: str):
+        try:
+            time_temp = humanfriendly.parse_timespan(time)
+
+        except:
+            return (create_embeds(ctx, ('Unavailable time format', '')), True)
+
+        if ctx.channel.slowmode_delay == time_temp:
+            return (create_embeds(ctx, ('There\'s already a slowmode in this channel with this time' if time_temp != 0 else 'There\'s no slowmode in this channel to remove', '')), True)
+
+        try:
+            await ctx.channel.edit(slowmode_delay=time_temp, reason=reason)
+
+        except HTTPException:
+            return (create_embeds(ctx, ('New time should be less than or equal to 6 hours', '')), True)
+
+        return (create_embeds(ctx, (f'{ctx.channel.name} slowmode {f"set to {humanfriendly.format_timespan(time_temp)}" if time_temp != 0 else "removed successfully"}\nReason: {reason}', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)

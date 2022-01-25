@@ -84,3 +84,9 @@ class Main:
             return (create_embeds(ctx, ('Result:', f'**[Website]({i})**'), embed_field=[('Title:', f'**[{title}]({i})**' if title else '**No title found**', False), ('Description:', f'```\n{desc["content"]}```' if desc else '**No description found***', False)]), False)
 
         return (create_embeds(ctx, ('No result found', '')), True)
+
+    def icon(self, ctx):
+        if len(icon := server_avatar(ctx.guild)) == 0:
+            return (create_embeds(ctx, ('This server has no icon', '')), True)
+
+        return (create_embeds(ctx, ('', f'**[Icon Link]({icon})**'), (ctx.guild.name, icon), embed_image=icon), False)
