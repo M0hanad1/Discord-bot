@@ -66,7 +66,8 @@ class MainCommands(commands.Cog, name='Global'):
     @commands.command(name='translate', aliases=['trans'])
     async def command_trans(self, ctx, *, text):
         '''To translate text'''
-        await ctx.reply(embed=self.main.trans(ctx, text)[0])
+        temp = await ctx.reply(embed=create_embeds(ctx, ('Translating...', '')))
+        await temp.edit(embed=self.main.trans(ctx, text)[0])
 
     @slash_command(name='info')
     async def slash_info(self, ctx):
@@ -129,6 +130,7 @@ class MainCommands(commands.Cog, name='Global'):
     @slash_command(name='translate')
     async def slash_trans(self, ctx, text: Option(str, 'Text you want to convert from'), from_: Option(str, 'Language you want to translate from', required='False', default='auto', name='from'), to: Option(str, 'Language you want to translate to', required=False, default=None)):
         '''To translate text'''
+        await ctx.defer()
         await ctx.respond(embed=(temp := self.main.trans(ctx, text, from_, to))[0], ephemeral=temp[1])
 
 

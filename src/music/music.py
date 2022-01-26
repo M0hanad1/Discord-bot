@@ -12,7 +12,7 @@ class Music:
         self.bot = bot
         self.queue = {}
         self.temp = {}
-        self.vol = 1.0
+        self.vol = {}
         self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 
     @staticmethod
@@ -33,7 +33,7 @@ class Music:
 
     def start(self, ctx, vc, info):
         vc.play(discord.FFmpegPCMAudio(source=info['formats'][0]['url'], **self.FFMPEG_OPTIONS), after=lambda _=None: self.play_next(ctx))
-        vc.source = discord.PCMVolumeTransformer(vc.source, volume=self.vol)
+        vc.source = discord.PCMVolumeTransformer(vc.source, volume=1.0 if ctx.guild.id not in self.vol else self.vol[ctx.guild.id])
 
     def play_next(self, ctx):
         vc = ctx.voice_client
@@ -49,12 +49,12 @@ class Music:
 
             self.start(ctx, vc, info)
             self.temp[ctx.guild.id] = [info, False]
-            return asyncio.run_coroutine_threadsafe(ctx.channel.send(embed=create_embeds(ctx, (f'Now playing:', f'**[{info["title"]}]({info["webpage_url"]})**\n**(`{self.get_time(info["duration"])}`)**'), embed_image=info['thumbnail'])), self.bot.loop)
+            return asyncio.run_coroutine_threadsafe(ctx.channel.send(embed=create_embeds(ctx, (f'Now playing:', f'**[{info["title"]}]({info["webpage_url"]})**\n**(`{self.get_time(info["duration"])}`)**'), embed_image=info['thumbnail']), delete_after=15), self.bot.loop)
 
         if check:
             del self.temp[ctx.guild.id]
 
-        asyncio.run_coroutine_threadsafe(ctx.channel.send(embed=create_embeds(ctx, ('No more songs', '')), delete_after=15), self.bot.loop)
+        asyncio.run_coroutine_threadsafe(ctx.channel.send(embed=create_embeds(ctx, ('No more songs', '')), delete_after=8), self.bot.loop)
 
     def check(self, ctx, vc, bot_vc, mood=None):
         if vc is None:
@@ -86,6 +86,9 @@ class Music:
 
             if ctx.guild.id in self.queue:
                 del self.queue[ctx.guild.id]
+
+            if ctx.guild.id in self.vol:
+                del self.vol[ctx.guild.id]
 
         except:
             await ctx.voice_client.move_to(vc.channel)
@@ -267,15 +270,20 @@ class Music:
 
         vc = ctx.voice_client
 
-        if not vc.is_playing() and not vc.is_paused():
-            return (create_embeds(ctx, ('There\'s nothing playing to [get | change] the volume', '')), True)
-
         if volume is None:
-            return (create_embeds(ctx, (f'The current volume is: {int(vc.source.volume * 100)}%', '')), False)
+            return (create_embeds(ctx, (f'The current volume is: {100 if ctx.guild.id not in self.vol else int(self.vol[ctx.guild.id] * 100)}%', '')), False)
 
         if volume < 0 or volume > 100:
             return (create_embeds(ctx, ('volume must be between 0 and 100', '')), True)
 
-        vc.source.volume = volume / 100
-        self.vol = volume / 100
+        if vc.is_playing() or vc.is_paused():
+            vc.source.volume = volume / 100
+
+        if volume == 100:
+            if ctx.guild.id in self.vol:
+                del self.vol[ctx.guild.id]
+
+        else:
+            self.vol[ctx.guild.id] = volume / 100
+
         return (create_embeds(ctx, (f'Volume changed to: {volume}%', '')), False)

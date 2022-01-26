@@ -80,7 +80,7 @@ class Main:
         for i in result:
             soup = BeautifulSoup(get(i).text, 'html.parser')
             title = soup.title.string
-            title = title if title else soup.find('title')
+            title = title if title else soup.find('meta', property='og:title')
             desc = soup.find('meta', attrs={'name': 'description'})
             desc = desc if desc else soup.find('meta', property='og:description')
             return (create_embeds(ctx, ('Result:', f'**[Website]({i})**'), embed_field=[('Title:', f'**[{title}]({i})**' if title else '**No title found**', False), ('Description:', f'```\n{desc["content"]}```' if desc else '**No description found**', False)]), False)
