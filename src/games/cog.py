@@ -34,6 +34,11 @@ class GamesCommands(commands.Cog, name='Games'):
         '''To get a random answer for your question'''
         await ctx.reply(embed=self.games.magic_ball(ctx, question))
 
+    @commands.command(name='choose')
+    async def command_choose(self, ctx, *, choices: str):
+        '''To choose a random choice from your choices'''
+        await ctx.reply(embed=self.games.choose(ctx, choices))
+
     @slash_command(name='random')
     async def slash_random(self, ctx):
         '''Try to guess the random number'''
@@ -58,6 +63,11 @@ class GamesCommands(commands.Cog, name='Games'):
     async def slash_8ball(self, ctx, question: Option(str, 'Question you want to ask')):
         '''To get a random answer for your question'''
         await ctx.respond(embed=self.games.magic_ball(ctx, question))
+
+    @slash_command(name='choose')
+    async def slash_choose(self, ctx, choices: Option(str, 'Choices you want to get a random choice from (every choice must end with ",")')):
+        '''To choose a random choice from your choices'''
+        await ctx.respond(embed=self.games.choose(ctx, choices))
 
 
 def setup(bot: commands.Bot):
