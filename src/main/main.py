@@ -58,15 +58,17 @@ class Main:
         return create_embeds(ctx, ('', message), (guild.name, icon), thumbnail=icon, embed_field=[('Owner:', guild.owner.mention, True), ('Created at:', f'<t:{int(guild.created_at.timestamp())}:R>', True), (f'Members:', f'Number: {guild.member_count}\nBoosts: {guild.premium_subscription_count}', True), ('Roles:', len(guild.roles)-1, True), ('Emojis:', len(guild.emojis), True), (f'Channels ({len(guild.text_channels) + len(guild.voice_channels)}):', f'Text: {len(guild.text_channels)}\nVoice: {len(guild.voice_channels)}', True)])
 
     def ping(self, ctx):
-        return create_embeds(ctx, (f'Your ping: {round(self.bot.latency * 1000)} ms', ''))
+        return create_embeds(ctx, (f'Your ping: `{round(self.bot.latency * 1000)}ms`', ''))
 
     def calc(self, ctx, calculation):
-        for i in calculation.replace(' ', ''):
+        calculation = calculation.lower().replace(' ', '').replace('x', '*')
+
+        for i in calculation:
             if i not in digits + '()./*+-':
                 return (create_embeds(ctx, ('Syntax error', '')), True)
 
         try:
-            return (create_embeds(ctx, (f'Result:\n{eval(calculation)}', '')), False)
+            return (create_embeds(ctx, ('Result:', f'```\n{eval(calculation)}```')), False)
 
         except ZeroDivisionError:
             return (create_embeds(ctx, ('Zero division error\nCan\'t division by zero', '')), True)

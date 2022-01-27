@@ -1,3 +1,4 @@
+import discord
 from src.games.games import Games
 from discord.commands import Option, slash_command
 from discord.ext import commands
@@ -39,6 +40,14 @@ class GamesCommands(commands.Cog, name='Games'):
         '''To choose a random choice from your choices'''
         await ctx.reply(embed=self.games.choose(ctx, choices))
 
+    @commands.command(name='tictactoe', aliases=['xo'])
+    async def command_tictactoe(self, ctx, member: discord.Member):
+        '''To play tictactoe game with other member'''
+        temp = await self.games.tictactoe(ctx, member, False)
+
+        if temp:
+            await ctx.reply(embed=temp[0])
+
     @slash_command(name='random')
     async def slash_random(self, ctx):
         '''Try to guess the random number'''
@@ -68,6 +77,14 @@ class GamesCommands(commands.Cog, name='Games'):
     async def slash_choose(self, ctx, choices: Option(str, 'Choices you want to get a random choice from (every choice must end with ",")')):
         '''To choose a random choice from your choices'''
         await ctx.respond(embed=self.games.choose(ctx, choices))
+
+    @slash_command(name='tictactoe')
+    async def slash_tictactoe(self, ctx, member: Option(discord.Member, 'Member you want to play with')):
+        '''To play tictactoe game with other member'''
+        temp = await self.games.tictactoe(ctx, member, True)
+
+        if temp:
+            await ctx.respond(embed=temp[0], ephemeral=temp[1])
 
 
 def setup(bot: commands.Bot):
