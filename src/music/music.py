@@ -32,8 +32,12 @@ class Music:
         return result
 
     def start(self, ctx, vc, info):
-        vc.play(discord.FFmpegPCMAudio(source=info['formats'][0]['url'], **self.FFMPEG_OPTIONS), after=lambda _=None: self.play_next(ctx))
-        vc.source = discord.PCMVolumeTransformer(vc.source, volume=1.0 if ctx.guild.id not in self.vol else self.vol[ctx.guild.id])
+        try:
+            vc.play(discord.FFmpegPCMAudio(source=info['formats'][0]['url'], **self.FFMPEG_OPTIONS), after=lambda _=None: self.play_next(ctx))
+            vc.source = discord.PCMVolumeTransformer(vc.source, volume=1.0 if ctx.guild.id not in self.vol else self.vol[ctx.guild.id])
+
+        except:
+            return
 
     def play_next(self, ctx):
         vc = ctx.voice_client
@@ -132,11 +136,11 @@ class Music:
                     self.queue[ctx.guild.id] = []
 
                 self.queue[ctx.guild.id].append(info)
-                return (create_embeds(ctx, (f'Added to queue:', f'**[{info["title"]}]({info["webpage_url"]})**\n**(`{self.get_time(info["duration"])}`)**'), embed_image=info['thumbnail']), False)
+                return (create_embeds(ctx, (f'Added to queue:', f'**[{info["title"]}]({info["webpage_url"]})**\n`{self.get_time(info["duration"])}`'), embed_image=info['thumbnail']), False)
 
             self.temp[ctx.guild.id] = [info, False]
             self.start(ctx, vc, info)
-            return (create_embeds(ctx, (f'Now playing:', f'**[{info["title"]}]({info["webpage_url"]})**\n**(`{self.get_time(info["duration"])}`)**'), embed_image=info['thumbnail']), False)
+            return (create_embeds(ctx, (f'Now playing:', f'**[{info["title"]}]({info["webpage_url"]})**\n`{self.get_time(info["duration"])}`'), embed_image=info['thumbnail']), False)
 
     async def add_playlist(self, ctx, vc, info):
         if ctx.guild.id not in self.queue:
@@ -146,12 +150,12 @@ class Music:
             self.queue[ctx.guild.id].append(info['entries'][0])
 
         [self.queue[ctx.guild.id].append(info['entries'][i]) for i in range(1, len(info['entries']))]
-        embed = create_embeds(ctx, (f'Playlist added to queue:', f'**[{info["title"]}]({info["webpage_url"]})**\n**(`{len(info["entries"])}`)**'), embed_image=info['entries'][0]["thumbnail"])
+        embed = create_embeds(ctx, (f'Playlist added to queue:', f'**[{info["title"]}]({info["webpage_url"]})**\n`{len(info["entries"])}`'), embed_image=info['entries'][0]["thumbnail"])
 
         if not vc.is_playing() and not vc.is_paused():
             self.temp[ctx.guild.id] = [info['entries'][0], False]
             self.start(ctx, vc, info['entries'][0])
-            embed.add_field(name='Now playing:', value=f'**[{info["entries"][0]["title"]}]({info["entries"][0]["webpage_url"]})**\n**(`{self.get_time(info["entries"][0]["duration"])}`)**')
+            embed.add_field(name='Now playing:', value=f'**[{info["entries"][0]["title"]}]({info["entries"][0]["webpage_url"]})**\n`{self.get_time(info["entries"][0]["duration"])}`')
 
         return embed
 
@@ -269,10 +273,10 @@ class Music:
         vc = ctx.voice_client
 
         if volume is None:
-            return (create_embeds(ctx, (f'The current volume is: {100 if ctx.guild.id not in self.vol else int(self.vol[ctx.guild.id] * 100)}%', '')), False)
+            return (create_embeds(ctx, (f'The current volume is: `{100 if ctx.guild.id not in self.vol else int(self.vol[ctx.guild.id] * 100)}%`', '')), False)
 
         if volume < 0 or volume > 100:
-            return (create_embeds(ctx, ('volume must be between 0 and 100', '')), True)
+            return (create_embeds(ctx, ('volume must be between `0` and `100`', '')), True)
 
         if vc.is_playing() or vc.is_paused():
             vc.source.volume = volume / 100
@@ -284,4 +288,4 @@ class Music:
         else:
             self.vol[ctx.guild.id] = volume / 100
 
-        return (create_embeds(ctx, (f'Volume changed to: {volume}%', '')), False)
+        return (create_embeds(ctx, (f'Volume changed to: `{volume}%`', '')), False)
