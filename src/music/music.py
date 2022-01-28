@@ -121,9 +121,10 @@ class Music:
                     info = ydl.extract_info(f"ytsearch:{item}", download=False)['entries'][0]
 
                     if info is None:
-                        raise
+                        print(None)
 
-                except:
+                except Exception as err:
+                    print(err)
                     return (create_embeds(ctx, ('There\'s no result found', '')), True)
 
             if 'entries' in info:
