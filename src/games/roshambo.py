@@ -26,7 +26,7 @@ class RoshamboButton(Button['Roshambo']):
 
         if (temp := view.check_winner()):
             emoji1, text1, emoji2, text2 = self.emojis[temp[0]], temp[0], self.emojis[temp[1]], temp[1]
-            await interaction.response.edit_message(embed=create_embeds(view.ctx, (f'`{emoji1}{text1}` deafeat `{emoji2}{text2}`', f'**{view.chooses[text1].mention} won**'), (view.chooses[text1].name, member_avatar(view.chooses[text1])), thumbnail=member_avatar(view.chooses[text1])), view=None)
+            await interaction.response.edit_message(embed=create_embeds(view.ctx, (f'`{emoji1}{text1}` defeat `{emoji2}{text2}`', f'**{view.chooses[text1].mention} won**'), (view.chooses[text1].name, member_avatar(view.chooses[text1])), thumbnail=member_avatar(view.chooses[text1])), view=None)
             view.stop()
             return
 
