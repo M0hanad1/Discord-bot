@@ -54,8 +54,6 @@ class Music:
         if check:
             del self.temp[ctx.guild.id]
 
-        asyncio.run_coroutine_threadsafe(ctx.channel.send(embed=create_embeds(ctx, ('No more songs', '')), delete_after=8), self.bot.loop)
-
     def check(self, ctx, vc, bot_vc, mood=None):
         if vc is None:
             return [False, create_embeds(ctx, ('Join a voice channel first', ''))]
@@ -121,10 +119,9 @@ class Music:
                     info = ydl.extract_info(f"ytsearch:{item}", download=False)['entries'][0]
 
                     if info is None:
-                        print(None)
+                        raise
 
-                except Exception as err:
-                    print(err)
+                except:
                     return (create_embeds(ctx, ('There\'s no result found', '')), True)
 
             if 'entries' in info:
