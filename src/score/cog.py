@@ -10,19 +10,19 @@ class ScoreCommands(commands.Cog, name='Score'):
         self.bot = bot
         self.data = Score(self.bot)
 
-    @commands.command(name='top')
-    async def command_top(self, ctx, mood: str='both', page: int=1):
-        '''To get top [global | local | both] score'''
-        await ctx.reply(embed=self.data.top(ctx, self.data.get_mood(mood.lower()), page))
-
     @commands.command(name='score')
     async def command_score(self, ctx, *, member: discord.Member=None):
         '''To get [your | member] score'''
         await ctx.reply(embed=await self.data.score(ctx, member))
 
+    @commands.command(name='top')
+    async def command_top(self, ctx, mood: str='both', page: int=1):
+        '''To get top [global | local | both] score'''
+        await ctx.reply(embed=self.data.top(ctx, self.data.get_mood(mood.lower()), page))
+
     @slash_command(name='score')
     async def slash_score(self, ctx, member: Option(discord.Member, 'Member you want to see his score', required=False, default=None)):
-        '''To get [your|member] score'''
+        '''To get [your | member] score'''
         await ctx.respond(embed=await self.data.score(ctx, member))
 
     @slash_command(name='top')

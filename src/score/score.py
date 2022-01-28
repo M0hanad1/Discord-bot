@@ -53,7 +53,7 @@ class Score:
 
     async def score(self, ctx, member: discord.Member):
         member = ctx.author if member is None else member
-        return create_embeds(ctx, (f'Score:\n{self.data.get_user_global(member.id)}', ''), (member.name, member_avatar(member)), embed_field=[(f'Local score:', f'**{self.data.get_user_local(ctx.guild.id, member.id)}**', False)])
+        return create_embeds(ctx, embed_author=(member.name, member_avatar(member)), embed_field=[('Global score:', f'`{self.data.get_user_global(member.id)}`', False), ('Local score:', f'`{self.data.get_user_local(ctx.guild.id, member.id)}`', False)])
 
     def get_mood(self, mood):
         if mood == 'global' or mood == 'g' or mood == 'discord' or mood == 'd':

@@ -58,7 +58,7 @@ class Random(View):
     children: List[RandomButton]
 
     def __init__(self, ctx, mood):
-        super().__init__()
+        super().__init__(timeout=120)
         self.random_number = randint(1, 10)
         self.ctx = ctx
         self.value = False
@@ -76,7 +76,7 @@ class Random(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if self.ctx.author.id != interaction.user.id:
-            await interaction.response.send_message(embed=create_embeds(self.ctx, ('You can\'t play this game\nCreate your own game', '')))
+            await interaction.response.send_message(embed=create_embeds(self.ctx, ('You can\'t play this game\nCreate your own game', '')), ephemeral=True)
             return False
 
         return True

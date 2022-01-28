@@ -6,6 +6,7 @@ from asyncio import TimeoutError
 from src.score.score import Score
 from src.games.tictactoe import TicTacToe
 from src.games.random import Random
+from src.games.roshambo import Roshambo
 from src.functions.functions import create_embeds, create_image, arabic_convert, member_avatar
 
 
@@ -94,27 +95,12 @@ class Games:
 
     async def random(self, ctx, mood):
         view = Random(ctx, mood)
-
-        if mood:
-            view.message = await ctx.respond(embed=create_embeds(ctx, ('Try to guess the random number!\nYou have 3 chances', '')), view=view)
-
-        else:
-            view.message = await ctx.reply(embed=create_embeds(ctx, ('Try to guess the random number!\nYou have 3 chances', '')), view=view)
-
+        embed = create_embeds(ctx, ('Try to guess the random number!\nYou have 3 chances', ''))
+        view.message = await ctx.respond(embed=embed, view=view) if mood else await ctx.reply(embed=embed, view=view)
         await view.wait()
 
         if view.value:
             self.data.upgrade_score(ctx, ctx.author)
-
-    async def tictactoe(self, ctx, member: discord.Member, mood):
-        if ctx.author.id == member.id:
-            return (create_embeds(ctx, ('You can\'t play with yourself', '')), True)
-
-        if member.bot:
-            return (create_embeds(ctx, ('You can\'t play with a bot', '')), True)
-
-        view = TicTacToe(ctx, ctx.author, member, mood)
-        view.message = await ctx.respond(embed=create_embeds(ctx, (f'It\'s X\'s turn', f'**It\'s {ctx.author.mention} turn**'), (ctx.author.name, member_avatar(ctx.author)), thumbnail=member_avatar(ctx.author)), view=view) if mood else await ctx.reply(embed=create_embeds(ctx, (f'It\'s X\'s turn', f'**It\'s {ctx.author.mention} turn**'), (ctx.author.name, member_avatar(ctx.author)), thumbnail=member_avatar(ctx.author)), view=view)
 
     def roll(self, ctx, min, max):
         if min > max:
@@ -133,3 +119,28 @@ class Games:
             raise commands.BadArgument
 
         return create_embeds(ctx, ('I choose:', f'```\n{choice(choices)}```'))
+
+    async def tictactoe(self, ctx, member: discord.Member, mood):
+        if ctx.author.id == member.id:
+            return (create_embeds(ctx, ('You can\'t play with yourself', '')), True)
+
+        if member.bot:
+            return (create_embeds(ctx, ('You can\'t play with a bot', '')), True)
+
+        view = TicTacToe(ctx, ctx.author, member, mood)
+        embed = create_embeds(ctx, (f'It\'s `X`\'s turn', f'**It\'s {ctx.author.mention} turn**'), (ctx.author.name, member_avatar(ctx.author)), thumbnail=member_avatar(ctx.author))
+        view.message = await ctx.respond(embed=embed, view=view) if mood else await ctx.reply(embed=embed, view=view)
+
+    async def roshambo(self, ctx, member: discord.Member, mood):
+        if member:
+            if ctx.author.id == member.id:
+                return (create_embeds(ctx, ('You can\'t play with yourself', '')), True)
+
+            if member.bot and member.id != self.bot.user.id:
+                return (create_embeds(ctx, ('You can\'t play with a bot', '')), True)
+
+        member = member if member else self.bot.user
+
+        view = Roshambo(ctx, [ctx.author, member], mood, self.bot)
+        embed = create_embeds(ctx, ('', f'**It\'s {ctx.author.mention} turn\nChoose one of Rock, Paper and Scissors**'), (ctx.author.name, member_avatar(ctx.author)), thumbnail=member_avatar(ctx.author))
+        view.message = await ctx.respond(embed=embed, view=view) if mood else await ctx.reply(embed=embed, view=view)

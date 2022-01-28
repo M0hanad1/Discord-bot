@@ -48,6 +48,14 @@ class GamesCommands(commands.Cog, name='Games'):
         if temp:
             await ctx.reply(embed=temp[0])
 
+    @commands.command(name='roshambo')
+    async def command_roshambo(self, ctx, member: discord.Member=None):
+        '''To play roshambo (Rock-Paper-Scissors) game with [me | member]'''
+        temp = await self.games.roshambo(ctx, member, False)
+
+        if temp:
+            await ctx.reply(embed=temp[0])
+
     @slash_command(name='random')
     async def slash_random(self, ctx):
         '''Try to guess the random number'''
@@ -82,6 +90,14 @@ class GamesCommands(commands.Cog, name='Games'):
     async def slash_tictactoe(self, ctx, member: Option(discord.Member, 'Member you want to play with')):
         '''To play tictactoe game with other member'''
         temp = await self.games.tictactoe(ctx, member, True)
+
+        if temp:
+            await ctx.respond(embed=temp[0], ephemeral=temp[1])
+
+    @slash_command(name='roshambo')
+    async def slash_roshambo(self, ctx, member: Option(discord.Member, 'Member you want to play with', required=False, default=None)):
+        '''To play roshambo (Rock-Paper-Scissors) game with [me | member]'''
+        temp = await self.games.roshambo(ctx, member, True)
 
         if temp:
             await ctx.respond(embed=temp[0], ephemeral=temp[1])
