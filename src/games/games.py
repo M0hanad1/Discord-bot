@@ -83,7 +83,6 @@ class Games:
         try:
             message = await self.bot.wait_for('message', check= lambda msg: (game == 'fast' and msg.content.lower() == word) or (game == 'spell' and msg.content.lower().strip() == ' '.join([i for i in word])), timeout=6 if game == 'fast' else 8)
             result = str(time.time() - start)[:4]
-            await message.add_reaction('<a:yes:931522286383693905>')
             await message.reply(embed=create_embeds(ctx, (f'You Won\nYou took {result}', ''), embed_author=(message.author.name, member_avatar(message.author)), embed_footer=('', '')))
             self.data.upgrade_score(ctx, message.author)
 
