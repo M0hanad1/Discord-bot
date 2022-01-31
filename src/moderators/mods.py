@@ -31,6 +31,9 @@ class Mods:
         if member == ctx.author:
             return (create_embeds(ctx, ('You can\'t kick yourself', '')), True)
 
+        if ctx.author.top_role.position <= member.top_role.position:
+            return (create_embeds(ctx, ('You can\'t kick this member', '')), True)
+
         await ctx.guild.kick(member, reason=reason)
         return (create_embeds(ctx, (f'Kicked from the server\nReason: {reason}', ''), (member.name, member_avatar(member))), False)
 
@@ -48,6 +51,9 @@ class Mods:
         for i in await ctx.guild.bans():
             if member == i.user:
                 return (create_embeds(ctx, ('You already banned this member', '')), True)
+
+        if member in ctx.guild.members and ctx.author.top_role.position <= member.top_role.position:
+            return (create_embeds(ctx, ('You can\'t ban this member', '')), True)
 
         await ctx.guild.ban(member, reason=reason, delete_message_days=message_num)
         return (create_embeds(ctx, (f'Banned from the server\nReason: {reason}', ''), (member.name, member_avatar(member))), False)
@@ -80,6 +86,9 @@ class Mods:
 
             if member == ctx.author:
                 return (create_embeds(ctx, ('You can\'t mute yourself', '')), True)
+
+            if ctx.author.top_role.position <= member.top_role.position:
+                return (create_embeds(ctx, ('You can\'t mute this member', '')), True)
 
             try:
                 time_temp = timedelta(seconds=humanfriendly.parse_timespan(time))
@@ -149,6 +158,9 @@ class Mods:
         if member == ctx.author and not ctx.author.guild_permissions.change_nickname:
             raise commands.MissingPermissions(['Change Nickname'])
 
+        if member != ctx.author and ctx.author.top_role.position <= member.top_role.position:
+            return (create_embeds(ctx, ('You can\'t change this member nickname', '')), True)
+
         name = member.name if name is None else name
 
         if len(name) > 32:
@@ -163,6 +175,9 @@ class Mods:
         return (create_embeds(ctx, ('Nickname changed succussfully', ''), (member.name, member_avatar(member)), embed_field=[('Member:', member.mention, False), ('Old nickname:', old_nick, False), ('New nickname:', name, False), ('Reason:', reason, False)]), False)
 
     async def role(self, ctx, member: discord.Member, role: discord.Role, reason):
+        if ctx.author.top_role.position <= member.top_role.position:
+            return (create_embeds(ctx, ('You can\'t change this member roles', '')), True)
+
         if role in member.roles:
             await member.remove_roles(role, reason=reason)
             mood = 'removed'
