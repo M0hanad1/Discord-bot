@@ -53,7 +53,7 @@ class Music:
 
             self.start(ctx, vc, info)
             self.temp[ctx.guild.id] = [info, False]
-            return asyncio.run_coroutine_threadsafe(ctx.channel.send(embed=create_embeds(ctx, (f'Now playing:', f'**[{info["title"]}]({info["webpage_url"]})**\n**(`{self.get_time(info["duration"])}`)**')), delete_after=15), self.bot.loop)
+            return asyncio.run_coroutine_threadsafe(ctx.channel.send(embed=create_embeds(ctx, (f'Now playing:', f'**[{info["title"]}]({info["webpage_url"]})**\n**(`{self.get_time(info["duration"])}`)**'), thumbnail=info['thumbnail']), delete_after=15), self.bot.loop)
 
         if check:
             del self.temp[ctx.guild.id]
@@ -136,11 +136,11 @@ class Music:
                     self.queue[ctx.guild.id] = []
 
                 self.queue[ctx.guild.id].append(info)
-                return (create_embeds(ctx, (f'Added to queue:', f'**[{info["title"]}]({info["webpage_url"]})**\n`{self.get_time(info["duration"])}`')), False)
+                return (create_embeds(ctx, (f'Added to queue:', f'**[{info["title"]}]({info["webpage_url"]})**\n`{self.get_time(info["duration"])}`'), thumbnail=info['thumbnail']), False)
 
             self.temp[ctx.guild.id] = [info, False]
             self.start(ctx, vc, info)
-            return (create_embeds(ctx, (f'Now playing:', f'**[{info["title"]}]({info["webpage_url"]})**\n`{self.get_time(info["duration"])}`')), False)
+            return (create_embeds(ctx, (f'Now playing:', f'**[{info["title"]}]({info["webpage_url"]})**\n`{self.get_time(info["duration"])}`'), thumbnail=info['thumbnail']), False)
 
     async def add_playlist(self, ctx, vc, info):
         if ctx.guild.id not in self.queue:
@@ -150,7 +150,7 @@ class Music:
             self.queue[ctx.guild.id].append(info['entries'][0])
 
         [self.queue[ctx.guild.id].append(info['entries'][i]) for i in range(1, len(info['entries']))]
-        embed = create_embeds(ctx, (f'Playlist added to queue:', f'**[{info["title"]}]({info["webpage_url"]})**\n`{len(info["entries"])}`'))
+        embed = create_embeds(ctx, (f'Playlist added to queue:', f'**[{info["title"]}]({info["webpage_url"]})**\n`{len(info["entries"])}`'), thumbnail=info['entries'][0]["thumbnail"])
 
         if not vc.is_playing() and not vc.is_paused():
             self.temp[ctx.guild.id] = [info['entries'][0], False]
