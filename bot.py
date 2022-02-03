@@ -5,9 +5,7 @@ from dotenv import load_dotenv
 from src.prefix.prefix import Prefix
 
 
-load_dotenv()
-prefix = Prefix()
-bot = commands.Bot(activity=discord.Game(name='+help'), intents=discord.Intents.all(), command_prefix=prefix.get_prefix)
+bot = commands.Bot(activity=discord.Game(name='+help'), intents=discord.Intents.all(), command_prefix=Prefix().get_prefix)
 
 
 @bot.event
@@ -20,4 +18,5 @@ for folder in os.listdir('./src'):
         bot.load_extension(f'src.{folder}.cog')
 
 if __name__ == '__main__':
+    load_dotenv()
     bot.run(os.getenv('TOKEN'))

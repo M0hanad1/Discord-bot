@@ -11,6 +11,13 @@ class Mods:
         self.bot = bot
         self.temp = 0
 
+    @staticmethod
+    def role_check(ctx, member: discord.Member):
+        if ctx.author.top_role.position <= member.top_role.position and member.top_role.position != 0 and ctx.guild.owner.id != ctx.author.id:
+            return True
+
+        return False
+
     def clear_check(self, filter, amount, message, msg):
         if filter is None:
             return message.id != msg.id
@@ -31,7 +38,7 @@ class Mods:
         if member == ctx.author:
             return (create_embeds(ctx, ('You can\'t kick yourself', '')), True)
 
-        if ctx.author.top_role.position <= member.top_role.position:
+        if self.role_check(ctx, member):
             return (create_embeds(ctx, ('You can\'t kick this member', '')), True)
 
         await ctx.guild.kick(member, reason=reason)
@@ -52,7 +59,7 @@ class Mods:
             if member == i.user:
                 return (create_embeds(ctx, ('You already banned this member', '')), True)
 
-        if member in ctx.guild.members and ctx.author.top_role.position <= member.top_role.position:
+        if member in ctx.guild.members and self.role_check(ctx, member):
             return (create_embeds(ctx, ('You can\'t ban this member', '')), True)
 
         await ctx.guild.ban(member, reason=reason, delete_message_days=message_num)
@@ -87,7 +94,7 @@ class Mods:
             if member == ctx.author:
                 return (create_embeds(ctx, ('You can\'t mute yourself', '')), True)
 
-            if ctx.author.top_role.position <= member.top_role.position:
+            if self.role_check(ctx, member):
                 return (create_embeds(ctx, ('You can\'t mute this member', '')), True)
 
             try:
@@ -96,11 +103,10 @@ class Mods:
             except:
                 return (create_embeds(ctx, ('Unavailable time format', '')), True)
 
-            try:
-                await member.timeout(discord.utils.utcnow() + time_temp)
-
-            except HTTPException:
+            if time_temp > timedelta(seconds=humanfriendly.parse_timespan('28d')):
                 return (create_embeds(ctx, ('Mute time should be less than or equal to 28 day', '')), True)
+
+            await member.timeout(discord.utils.utcnow() + time_temp)
 
             return (create_embeds(ctx, (f'Has been muted\nTime: {humanfriendly.format_timespan(time_temp)}\nReason: {reason}', ''), (member.name, member_avatar(member))), False)
 
@@ -158,7 +164,7 @@ class Mods:
         if member == ctx.author and not ctx.author.guild_permissions.change_nickname:
             raise commands.MissingPermissions(['Change Nickname'])
 
-        if member != ctx.author and ctx.author.top_role.position <= member.top_role.position:
+        if member != ctx.author and self.role_check(ctx, member):
             return (create_embeds(ctx, ('You can\'t change this member nickname', '')), True)
 
         name = member.name if name is None else name
@@ -175,8 +181,9 @@ class Mods:
         return (create_embeds(ctx, ('Nickname changed succussfully', ''), (member.name, member_avatar(member)), embed_field=[('Member:', member.mention, False), ('Old nickname:', old_nick, False), ('New nickname:', name, False), ('Reason:', reason, False)]), False)
 
     async def role(self, ctx, member: discord.Member, role: discord.Role, reason):
-        if ctx.author.top_role.position <= member.top_role.position:
-            return (create_embeds(ctx, ('You can\'t change this member roles', '')), True)
+        if (temp := self.role_check(ctx, member)) or role.position >= ctx.author.top_role.position:
+            if (role.position >= member.top_role.position or role.position >= ctx.author.top_role.position) and temp:
+                return (create_embeds(ctx, ('You can\'t change this member roles', '')), True)
 
         if role in member.roles:
             await member.remove_roles(role, reason=reason)
@@ -198,10 +205,9 @@ class Mods:
         if ctx.channel.slowmode_delay == time_temp:
             return (create_embeds(ctx, ('There\'s already a slowmode in this channel with this time' if time_temp != 0 else 'There\'s no slowmode in this channel to remove', '')), True)
 
-        try:
-            await ctx.channel.edit(slowmode_delay=time_temp, reason=reason)
-
-        except HTTPException:
+        if time_temp > 21600:
             return (create_embeds(ctx, ('New time should be less than or equal to 6 hours', '')), True)
+
+        await ctx.channel.edit(slowmode_delay=time_temp, reason=reason)
 
         return (create_embeds(ctx, (f'{ctx.channel.name} slowmode {f"set to {humanfriendly.format_timespan(time_temp)}" if time_temp != 0 else "removed successfully"}\nReason: {reason}', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
