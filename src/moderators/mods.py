@@ -96,7 +96,7 @@ class Mods:
             if self.role_check(ctx, member):
                 return (create_embeds(ctx, ('You can\'t mute this member', '')), True)
 
-            if member.guild_permissions.administrator():
+            if member.guild_permissions.administrator:
                 return (create_embeds(ctx, ('You can\'t mute member that has administrator permissions', '')), True)
 
             try:
