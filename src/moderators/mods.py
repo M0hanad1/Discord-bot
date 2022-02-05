@@ -1,5 +1,4 @@
 import discord
-from discord.errors import HTTPException
 from discord.ext import commands
 from datetime import timedelta
 import humanfriendly
@@ -13,7 +12,7 @@ class Mods:
 
     @staticmethod
     def role_check(ctx, member: discord.Member):
-        if ctx.author.top_role.position <= member.top_role.position and member.top_role.position != 0 and ctx.guild.owner.id != ctx.author.id:
+        if (ctx.author.top_role.position <= member.top_role.position and member.top_role.position != 0 and ctx.guild.owner.id != ctx.author.id) or ctx.guild.owner.id == member.id:
             return True
 
         return False
@@ -97,6 +96,9 @@ class Mods:
             if self.role_check(ctx, member):
                 return (create_embeds(ctx, ('You can\'t mute this member', '')), True)
 
+            if member.guild_permissions.administrator():
+                return (create_embeds(ctx, ('You can\'t mute member that has administrator permissions', '')), True)
+
             try:
                 time_temp = timedelta(seconds=humanfriendly.parse_timespan(time))
 
@@ -155,7 +157,8 @@ class Mods:
         except:
             pass
 
-        await msg.channel.send(embed=create_embeds(ctx, (f'{len(deleted)} messages has been deleted successfully!', ''), (ctx.guild.name, server_avatar(ctx.guild))), delete_after=5)
+        self.temp = 0
+        await msg.channel.send(embed=create_embeds(ctx, (f'`{len(deleted)}` messages deleted successfully!', ''), (ctx.guild.name, server_avatar(ctx.guild))), delete_after=5)
 
     async def nick(self, ctx, member: discord.Member, name, reason):
         if member != ctx.author and not ctx.author.guild_permissions.manage_nicknames:
@@ -181,9 +184,8 @@ class Mods:
         return (create_embeds(ctx, ('Nickname changed succussfully', ''), (member.name, member_avatar(member)), embed_field=[('Member:', member.mention, False), ('Old nickname:', old_nick, False), ('New nickname:', name, False), ('Reason:', reason, False)]), False)
 
     async def role(self, ctx, member: discord.Member, role: discord.Role, reason):
-        if (temp := self.role_check(ctx, member)) or role.position >= ctx.author.top_role.position:
-            if (role.position >= member.top_role.position or role.position >= ctx.author.top_role.position) and temp:
-                return (create_embeds(ctx, ('You can\'t change this member roles', '')), True)
+        if role.position >= ctx.author.top_role.position and ctx.guild.owner.id != ctx.author.id:
+            return (create_embeds(ctx, ('You can\'t change this role', '')), True)
 
         if role in member.roles:
             await member.remove_roles(role, reason=reason)

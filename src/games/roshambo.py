@@ -18,9 +18,15 @@ class RoshamboButton(Button['Roshambo']):
         view: Roshambo = self.view
 
         if self.item in view.chooses:
-            await interaction.response.edit_message(embed=create_embeds(view.ctx, (f'You all choose `{self.emojis[self.item]}{self.item}`\nNo one won', '')), view=None)
-            view.stop()
-            return
+            if view.players[1].id == view.bot.user.id:
+                items_temp = ['Rock', 'Paper', 'Scissors']
+                items_temp.remove(self.item)
+                view.chooses[choice(items_temp)] = view.bot.user
+
+            else:
+                await interaction.response.edit_message(embed=create_embeds(view.ctx, (f'You all choose `{self.emojis[self.item]}{self.item}`\nNo one won', '')), view=None)
+                view.stop()
+                return
 
         view.chooses[self.item] = interaction.user
 
@@ -40,6 +46,7 @@ class Roshambo(View):
     def __init__(self, ctx, players, mood, bot):
         super().__init__(timeout=120)
         self.ctx = ctx
+        self.bot = bot
         self.players = players
         self.current_player = players[0]
         self.chooses = {}
