@@ -97,7 +97,7 @@ class Mods:
                 return (create_embeds(ctx, ('You can\'t mute this member', '')), True)
 
             if member.guild_permissions.administrator:
-                return (create_embeds(ctx, ('You can\'t mute member that has administrator permissions', '')), True)
+                return (create_embeds(ctx, ('You can\'t mute member that has `administrator` permissions', '')), True)
 
             try:
                 time_temp = timedelta(seconds=humanfriendly.parse_timespan(time))
@@ -106,7 +106,7 @@ class Mods:
                 return (create_embeds(ctx, ('Unavailable time format', '')), True)
 
             if time_temp > timedelta(seconds=humanfriendly.parse_timespan('28d')):
-                return (create_embeds(ctx, ('Mute time should be less than or equal to 28 day', '')), True)
+                return (create_embeds(ctx, ('Mute time should be less than or equal to `28 day`', '')), True)
 
             await member.timeout(discord.utils.utcnow() + time_temp)
 
@@ -208,8 +208,8 @@ class Mods:
             return (create_embeds(ctx, ('There\'s already a slowmode in this channel with this time' if time_temp != 0 else 'There\'s no slowmode in this channel to remove', '')), True)
 
         if time_temp > 21600:
-            return (create_embeds(ctx, ('New time should be less than or equal to 6 hours', '')), True)
+            return (create_embeds(ctx, ('New time should be less than or equal to `6 hours`', '')), True)
 
         await ctx.channel.edit(slowmode_delay=time_temp, reason=reason)
 
-        return (create_embeds(ctx, (f'{ctx.channel.name} slowmode {f"set to {humanfriendly.format_timespan(time_temp)}" if time_temp != 0 else "removed successfully"}\nReason: {reason}', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
+        return (create_embeds(ctx, (f'{ctx.channel.name} slowmode {f"set to `{humanfriendly.format_timespan(time_temp)}`" if time_temp != 0 else "removed successfully"}\nReason: {reason}', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
