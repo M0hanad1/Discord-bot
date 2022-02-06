@@ -7,17 +7,11 @@ from src.prefix.prefix import Prefix
 
 
 bot = commands.Bot(activity=discord.Game(name='+help'), intents=discord.Intents.all(), command_prefix=Prefix().get_prefix)
-bot.topggpy = topgg.DBLClient(bot, os.getenv('TOPGG_TOKEN'), autopost=True, post_shard_count=True)
 
 
 @bot.event
 async def on_ready():
     print(f'{bot.user} is ready')
-
-
-@bot.event
-async def on_autopost_success():
-    print(f"Posted server count ({bot.topggpy.guild_count}), shard count ({bot.shard_count})")
 
 
 for folder in os.listdir('./src'):
