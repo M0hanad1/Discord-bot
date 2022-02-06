@@ -1,5 +1,4 @@
 import discord
-import topgg
 import os
 from discord.ext import commands
 from dotenv import load_dotenv
