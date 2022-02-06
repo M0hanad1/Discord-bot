@@ -1,7 +1,5 @@
-wheel
-git+https://github.com/Pycord-Development/pycord
-py-cord[speed]
-py-cord[voice]
+wheel==0.37.1
+topggpy==1.4.0
 PyNaCl==1.4.0
 requests==2.26.0
 dnspython==2.1.0
@@ -16,4 +14,8 @@ youtube_dl==2021.12.17
 beautifulsoup4==4.10.0
 google==3.0.0
 googletrans==3.1.0a0
-git+https://github.com/Harukomaze/ranimegen
+lxml==4.7.1
+ranimegen==0.1.0
+git+https://github.com/Pycord-Development/pycord
+py-cord[speed]
+py-cord[voice]

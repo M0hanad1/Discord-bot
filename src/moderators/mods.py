@@ -173,7 +173,7 @@ class Mods:
         name = member.name if name is None else name
 
         if len(name) > 32:
-            return (create_embeds(ctx, ('The nick name must be 32 ro fewer in length', '')), True)
+            return (create_embeds(ctx, ('The nickname must be `32` ro fewer in length', '')), True)
 
         old_nick = member.name if member.nick is None else member.nick
 
