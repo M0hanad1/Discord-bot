@@ -5,16 +5,17 @@ from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
 
 
-def create_embeds(ctx=None, base_embed=('', ''), embed_author=('', ''), embed_footer=None, embed_image='', thumbnail='', embed_color=0x000000, embed_field=None):
-    new_embed = discord.Embed(title=base_embed[0], description=base_embed[1], color=embed_color, timestamp=datetime.utcnow())
+def create_embeds(ctx=None, base_embed=('', ''), embed_author=('', '', ''), embed_footer=None, embed_image='', thumbnail='', embed_color=0x000000, embed_field=None, embed_url=''):
+    new_embed = discord.Embed(title=base_embed[0], description=base_embed[1], color=embed_color, timestamp=datetime.utcnow(), url=embed_url)
 
-    if embed_footer is None and ctx is not None:
-        new_embed.set_footer(text=f'{str(ctx.author.name)}#{str(ctx.author.discriminator)}', icon_url=member_avatar(ctx.author))
+    if embed_footer is None:
+        if ctx is not None:
+            new_embed.set_footer(text=f'{str(ctx.author.name)}#{str(ctx.author.discriminator)}', icon_url=member_avatar(ctx.author))
 
     else:
         new_embed.set_footer(text=embed_footer[0], icon_url=embed_footer[1])
 
-    new_embed.set_author(name=embed_author[0], icon_url=embed_author[1])
+    new_embed.set_author(name=embed_author[0], icon_url=embed_author[1], url=embed_author[2] if len(embed_author) == 3 else '')
     new_embed.set_image(url=embed_image)
     new_embed.set_thumbnail(url=thumbnail)
 
