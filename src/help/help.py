@@ -119,7 +119,7 @@ class Help:
         avatar = member_avatar(self.bot.user)
         owner = 'https://discordapp.com/users/589198370111881216/'
         topgg = f'https://top.gg/bot/{self.bot.user.id}'
-        embed = create_embeds(ctx, (f'{self.bot.user.name} Help', f'Simple discord bot made by [NOGAF]({owner}).\nThe bot has Moderations, Fun, Music and others commands.\nAnd it has custom prefix feature, score system and more.\nGive it a try.'), (self.bot.user.name, avatar, topgg), thumbnail=avatar, embed_field=[('Links:', f'> **[top.gg]({topgg})**\n> **[Invite]({topgg}/invite)**\n> **[Developer]({owner})**', False)])
+        embed = create_embeds(ctx, (f'{self.bot.user.name} Help', f'Simple discord bot made by [NOGAF]({owner}).\nThe bot has Moderations, Fun, Music and others commands.\nAnd it has custom prefix feature, score system and more.\nGive it a try.'), (self.bot.user.name, avatar, topgg), thumbnail=avatar, embed_field=[('Links:', f'> **[top.gg]({topgg})**\n> **[Invite](https://discord.com/api/oauth2/authorize?client_id=895633975274532906&permissions=8&scope=bot%20applications.commands)**\n> **[Developer]({owner})**', False)])
         options.append(('Main Menu', 'Bot help main menu', embed))
 
         for cog in mapping:
