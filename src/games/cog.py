@@ -10,47 +10,58 @@ class GamesCommands(commands.Cog, name='Games'):
         self.bot = bot
         self.games = Games(self.bot)
 
-    @commands.command(name='random', aliases=['rand'])
+    @commands.command(name='random', aliases=['rand'], description='Try to guess the random number', usage='random')
     async def command_random(self, ctx):
-        '''Try to guess the random number'''
+        '''{prefix}random'''
         await self.games.random(ctx, False)
 
-    @commands.command(name='fast', aliases=['speed'])
-    async def command_fast(self, ctx, lang='random'):
-        '''Try to type the word as fast as you can'''
-        await self.games.typing_games(ctx, lang, 'fast', False)
+    @commands.command(name='fast', aliases=['speed'], description='Try to type the word as fast as you can', usage='fast (language=random)')
+    async def command_fast(self, ctx, language='random'):
+        '''{prefix}fast
+        {prefix}fast arabic
+        {prefix}fast english
+        '''
+        await self.games.typing_games(ctx, language, 'fast', False)
 
-    @commands.command(name='spell')
-    async def command_spell(self, ctx, lang='random'):
-        '''Try to spell the word as fast as you can'''
-        await self.games.typing_games(ctx, lang, 'spell', False)
+    @commands.command(name='spell', description='Try to spell the word as fast as you can', usage='spell (language=random)')
+    async def command_spell(self, ctx, language='random'):
+        '''{prefix}spell
+        {prefix}spell ar
+        {prefix}spell en
+        '''
+        await self.games.typing_games(ctx, language, 'spell', False)
 
-    @commands.command(name='roll')
+    @commands.command(name='roll', description='Get a random number with prefix command', usage='roll (min=1) (max=10)')
     async def command_roll(self, ctx, min: int=1, max: int=10):
-        '''To get a random number with prefix command'''
+        '''{prefix}roll
+        {prefix}roll 2
+        {prefix}roll 10 15
+        '''
         await ctx.reply(embed=self.games.roll(ctx, min, max)[0])
 
-    @commands.command(name='8ball')
+    @commands.command(name='8ball', description='Get a random answer for your question', usage='8ball [question]')
     async def command_8ball(self, ctx, *, question: str):
-        '''To get a random answer for your question'''
+        '''{prefix}8ball I'm gonna work with google?'''
         await ctx.reply(embed=self.games.magic_ball(ctx, question))
 
-    @commands.command(name='choose')
+    @commands.command(name='choose', description='Choose a random choice', usage='choose [choices]')
     async def command_choose(self, ctx, *, choices: str):
-        '''To choose a random choice from your choices'''
+        '''{prefix}choose Python, C#, C++, TypeScript'''
         await ctx.reply(embed=self.games.choose(ctx, choices))
 
-    @commands.command(name='tictactoe', aliases=['xo'])
+    @commands.command(name='tictactoe', aliases=['xo'], description='Play tictactoe game with other member', usage='tictactoe [member]')
     async def command_tictactoe(self, ctx, member: discord.Member):
-        '''To play tictactoe game with other member'''
+        '''{prefix}tictactoe {mention}'''
         temp = await self.games.tictactoe(ctx, member, False)
 
         if temp:
             await ctx.reply(embed=temp[0])
 
-    @commands.command(name='roshambo')
+    @commands.command(name='roshambo', description='Play roshambo(Rock-Paper-Scissors) game with [me, member]', usage='roshambo (member=the_bot)')
     async def command_roshambo(self, ctx, member: discord.Member=None):
-        '''To play roshambo (Rock-Paper-Scissors) game with [me | member]'''
+        '''{prefix}roshambo
+        {prefix}roshambo {mention}
+        '''
         temp = await self.games.roshambo(ctx, member, False)
 
         if temp:
@@ -73,22 +84,22 @@ class GamesCommands(commands.Cog, name='Games'):
 
     @slash_command(name='roll')
     async def slash_roll(self, ctx, min: Option(int, 'Min number you want to start with', required=False, default=1), max: Option(int, 'Max number you want to end with', required=False, default=10)):
-        '''To get a random number'''
+        '''Get a random number'''
         await ctx.respond(embed=(temp := self.games.roll(ctx, min, max))[0], ephemeral=temp[1])
 
     @slash_command(name='8ball')
     async def slash_8ball(self, ctx, question: Option(str, 'Question you want to ask')):
-        '''To get a random answer for your question'''
+        '''Get a random answer for your question'''
         await ctx.respond(embed=self.games.magic_ball(ctx, question))
 
     @slash_command(name='choose')
-    async def slash_choose(self, ctx, choices: Option(str, 'Choices you want to get a random choice from (every choice must end with ",")')):
-        '''To choose a random choice from your choices'''
+    async def slash_choose(self, ctx, choices: Option(str, 'Your choices (every choice must end with `,`)')):
+        '''Choose a random choice from your choices'''
         await ctx.respond(embed=self.games.choose(ctx, choices))
 
     @slash_command(name='tictactoe')
     async def slash_tictactoe(self, ctx, member: Option(discord.Member, 'Member you want to play with')):
-        '''To play tictactoe game with other member'''
+        '''Play tictactoe game with other member'''
         temp = await self.games.tictactoe(ctx, member, True)
 
         if temp:
@@ -96,7 +107,7 @@ class GamesCommands(commands.Cog, name='Games'):
 
     @slash_command(name='roshambo')
     async def slash_roshambo(self, ctx, member: Option(discord.Member, 'Member you want to play with', required=False, default=None)):
-        '''To play roshambo (Rock-Paper-Scissors) game with [me | member]'''
+        '''Play roshambo (Rock-Paper-Scissors) game with [me, member]'''
         temp = await self.games.roshambo(ctx, member, True)
 
         if temp:

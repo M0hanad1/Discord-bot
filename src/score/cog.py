@@ -10,24 +10,27 @@ class ScoreCommands(commands.Cog, name='Score'):
         self.bot = bot
         self.data = Score(self.bot)
 
-    @commands.command(name='score')
+    @commands.command(name='score', description='Get [your, member] score', usage='score (member=you)')
     async def command_score(self, ctx, *, member: discord.Member=None):
-        '''To get [your | member] score'''
+        '''{prefix}score
+        {prefix}score {mention}'''
         await ctx.reply(embed=await self.data.score(ctx, member))
 
-    @commands.command(name='top')
+    @commands.command(name='top', description='Get top [global, local, both] score', usage='top (mood=both) (page=1)')
     async def command_top(self, ctx, mood: str='both', page: int=1):
-        '''To get top [global | local | both] score'''
+        '''{prefix}top
+        {prefix}top local
+        {prefix}top global 3'''
         await ctx.reply(embed=self.data.top(ctx, self.data.get_mood(mood.lower()), page))
 
     @slash_command(name='score')
     async def slash_score(self, ctx, member: Option(discord.Member, 'Member you want to see his score', required=False, default=None)):
-        '''To get [your | member] score'''
+        '''Get [your, member] score'''
         await ctx.respond(embed=await self.data.score(ctx, member))
 
     @slash_command(name='top')
-    async def slash_top(self, ctx, mood: Option(str, 'Choose to display [Global | Local | Both] score', choices=['Global', 'Local', 'Both'], required=False, default='both'), page: Option(int, 'Page you want to display', required=False, default=1)):
-        '''To get top [global | local | both] score'''
+    async def slash_top(self, ctx, mood: Option(str, 'Choose to display [Global, Local, Both] score', choices=['Global', 'Local', 'Both'], required=False, default='both'), page: Option(int, 'Page you want to display', required=False, default=1)):
+        '''Get top [global, local, both] score'''
         await ctx.respond(embed=self.data.top(ctx, mood.lower(), page))
 
 

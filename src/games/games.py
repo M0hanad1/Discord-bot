@@ -83,7 +83,7 @@ class Games:
         try:
             message = await self.bot.wait_for('message', check= lambda msg: (game == 'fast' and msg.content.lower() == word) or (game == 'spell' and msg.content.lower().strip() == ' '.join([i for i in word])), timeout=6 if game == 'fast' else 8)
             result = str(time.time() - start)[:4]
-            await message.reply(embed=create_embeds(ctx, (f'You Won\nYou took {result}', ''), embed_author=(message.author.name, member_avatar(message.author)), embed_footer=('', '')))
+            await message.reply(embed=create_embeds(ctx, (f'You Won\nYou took: `{result}` Seconds', ''), embed_author=(message.author.name, member_avatar(message.author)), embed_footer=('', '')))
             self.data.upgrade_score(ctx, message.author)
 
         except TimeoutError:
@@ -94,7 +94,7 @@ class Games:
 
     async def random(self, ctx, mood):
         view = Random(ctx, mood)
-        embed = create_embeds(ctx, ('Try to guess the random number!\nYou have 3 chances', ''))
+        embed = create_embeds(ctx, ('Try to guess the random number!\nYou have `3` chances', ''))
         view.message = await ctx.respond(embed=embed, view=view) if mood else await ctx.reply(embed=embed, view=view)
         await view.wait()
 
@@ -103,9 +103,9 @@ class Games:
 
     def roll(self, ctx, min, max):
         if min > max:
-            return (create_embeds(ctx, ('The min number should be less than the mex number', '')), True)
+            return (create_embeds(ctx, ('The min number should be less than the max number', '')), True)
 
-        return (create_embeds(ctx, (f'The random number: {randint(min, max)}', '')), False)
+        return (create_embeds(ctx, (f'The random number: `{randint(min, max)}`', '')), False)
 
     def magic_ball(self, ctx, question):
         responses = ['As I see it, yes.', 'Ask again later.', 'Better not tell you now.', 'Cannot predict now.', 'Concentrate and ask again.', 'Don\'t count on it.', 'It is certain.', 'It is decidedly so.', 'Most likely.', 'My reply is no.', 'My sources say no.', 'Outlook not so good.', 'Outlook good.', 'Reply hazy, try again.', 'Signs point to yes.', 'Very doubtful.', 'Without a doubt.', 'Yes.', 'No.', 'Yes - definitely.', 'You may rely on it.']

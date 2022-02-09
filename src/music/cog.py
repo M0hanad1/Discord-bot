@@ -10,99 +10,103 @@ class MusicCommands(commands.Cog, name='Music'):
         self.bot = bot
         self.music = Music(self.bot)
 
-    @commands.command(name='join')
+    @commands.command(name='join', description='To join the voice channel', usage='join')
     async def command_join(self, ctx):
-        '''To join a voice channel'''
+        '''{prefix}join'''
         await ctx.reply(embed=(await self.music.join(ctx))[0])
 
-    @commands.command(name='leave')
+    @commands.command(name='leave', description='Leave the voice channel', usage='leave')
     async def command_leave(self, ctx):
-        '''To leave a voice channel'''
+        '''{prefix}leave'''
         await ctx.reply(embed=(await self.music.leave(ctx))[0])
 
-    @commands.command(name='play')
+    @commands.command(name='play', description='Play [video, playlist] in voice channel by [name, link]', usage='play [name]')
     async def command_play(self, ctx, *, name):
-        '''To play video in voice channel'''
+        '''{prefix}play Celeste Chapter 2 ost
+        {prefix}play https://www.youtube.com/watch?v=iik25wqIuFo
+        {prefix}play https://youtube.com/playlist?list=PLe1jcCJWvkWiWLp9h3ge0e5v7n6kxEfOG'''
         temp = await ctx.reply(embed=create_embeds(ctx, ('Searching...', '')))
         await temp.edit(embed=(await self.music.play(ctx, name))[0])
 
-    @commands.command(name='pause')
+    @commands.command(name='pause', description='Pause a voice channel', usage='pause')
     async def command_pause(self, ctx):
-        '''To pause a voice channel'''
+        '''{prefix}pause'''
         await ctx.reply(embed=(await self.music.pause(ctx))[0])
 
-    @commands.command(name='resume')
+    @commands.command(name='resume', description='Resume a voice channel', usage='resume')
     async def command_resume(self, ctx):
-        '''To resume a voice channel'''
+        '''{prefix}resume'''
         await ctx.reply(embed=(await self.music.resume(ctx))[0])
 
-    @commands.command(name='stop')
+    @commands.command(name='stop', description='Stop a voice channel', usage='stop')
     async def command_stop(self, ctx):
-        '''To stop a voice channel'''
+        '''{prefix}stop'''
         await ctx.reply(embed=(await self.music.stop(ctx))[0])
 
-    @commands.command(name='skip')
+    @commands.command(name='skip', description='Skip the current song', usage='skip')
     async def command_skip(self, ctx):
-        '''To skip current song'''
+        '''{prefix}skip'''
         temp = await self.music.skip(ctx)
 
         if temp is not None:
             await ctx.reply(embed=temp[0])
 
-    @commands.command(name='loop')
+    @commands.command(name='loop', description='Loop on the current song', usage='loop')
     async def command_loop(self, ctx):
-        '''To loop in current song'''
+        '''{prefix}loop'''
         await ctx.reply(embed=(await self.music.loop(ctx))[0])
 
-    @commands.command(name='queue')
+    @commands.command(name='queue', description='Show the voice channel queue', usage='page (page=1)')
     async def command_queue(self, ctx, page: int=1):
-        '''To show voice channel queue'''
+        '''{prefix}queue
+        {prefix}queue 3'''
         await ctx.reply(embed=(await self.music.queue_display(ctx, page))[0])
 
-    @commands.command(name='remove')
+    @commands.command(name='remove', description='Remove a song from the queue by the index (id)', usage='remove [index]')
     async def command_remove(self, ctx, index: int):
-        '''To remove song from queue by index (id)'''
+        '''{prefix}remove 2'''
         await ctx.reply(embed=(await self.music.remove(ctx, index))[0])
 
-    @commands.command(name='volume', aliases=['vol'])
+    @commands.command(name='volume', aliases=['vol'], description='[See, Change] the voice channel volume', usage='volume (volume)')
     async def command_volume(self, ctx, volume: int=None):
-        '''To [see | change] voice channel volume'''
+        '''{prefix}volume
+        {prefix}volume 75'''
         await ctx.reply(embed=(await self.music.volume(ctx, volume))[0])
 
     @slash_command(name='join')
     async def slash_join(self, ctx):
-        '''To join a voice channel'''
+        '''Join the voice channel'''
         await ctx.respond(embed=(temp := (await self.music.join(ctx)))[0], ephemeral=temp[1])
 
     @slash_command(name='leave')
     async def slash_leave(self, ctx):
-        '''To leave a voice channel'''
+        '''Leave the voice channel'''
         await ctx.respond(embed=(temp := (await self.music.leave(ctx)))[0], ephemeral=temp[1])
 
     @slash_command(name='play')
-    async def slash_play(self, ctx, name: Option(str, '[Name | Link] of the [video | playlist] you want to play')):
-        '''To play video in voice channel'''
+    async def slash_play(self, ctx, name: Option(str, '[Name, Link] of the [video, playlist] you want to play')):
+        '''Play [video, playlist] in voice channel by [name, link]'''
         await ctx.defer()
         await ctx.respond(embed=(await self.music.play(ctx, name))[0])
 
     @slash_command(name='pause')
     async def slash_pause(self, ctx):
-        '''To pause a voice channel'''
+        '''Pause a voice channel'''
         await ctx.respond(embed=(temp := (await self.music.pause(ctx)))[0], ephemeral=temp[1])
 
     @slash_command(name='resume')
     async def slash_resume(self, ctx):
-        '''To resume a voice channel'''
+        '''Resume a voice channel'''
         await ctx.respond(embed=(temp := (await self.music.resume(ctx)))[0], ephemeral=temp[1])
 
     @slash_command(name='stop')
     async def slash_stop(self, ctx):
-        '''To stop a voice channel'''
+        '''Stop a voice channel'''
         await ctx.respond(embed=(temp := (await self.music.stop(ctx)))[0], ephemeral=temp[1])
 
     @slash_command(name='skip')
     async def slash_skip(self, ctx):
-        '''To skip current song'''
+        '''Skip the current song'''
         temp = await self.music.skip(ctx)
 
         if temp is not None:
@@ -113,22 +117,22 @@ class MusicCommands(commands.Cog, name='Music'):
 
     @slash_command(name='loop')
     async def slash_loop(self, ctx):
-        '''To loop in current song'''
+        '''Loop on the current song'''
         await ctx.respond(embed=(temp := (await self.music.loop(ctx)))[0], ephemeral=temp[1])
 
     @slash_command(name='queue')
     async def slash_queue(self, ctx, page: Option(int, 'Page of the queue you want to see', required=False, default=1)):
-        '''To show voice channel queue'''
+        '''Show the voice channel queue'''
         await ctx.respond(embed=(temp := (await self.music.queue_display(ctx, page)))[0], ephemeral=temp[1])
 
     @slash_command(name='remove')
     async def slash_remove(self, ctx, index: Option(int, 'Index of the song you want to remove')):
-        '''To remove song from queue by index (id)'''
+        '''Remove a song from the queue by the index (id)'''
         await ctx.respond(embed=(temp := (await self.music.remove(ctx, index)))[0], ephemeral=temp[1])
 
     @slash_command(name='volume')
     async def slash_volume(self, ctx, volume: Option(int, 'New volume you want to use', required=False, default=None)):
-        '''To [see | change] voice channel volume'''
+        '''[See, Change] the volume of the voice channel'''
         await ctx.respond(embed=(temp := (await self.music.volume(ctx, volume)))[0], ephemeral=temp[1])
 
 

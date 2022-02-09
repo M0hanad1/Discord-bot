@@ -53,7 +53,7 @@ class Music:
 
             self.start(ctx, vc, info)
             self.temp[ctx.guild.id] = [info, False]
-            return asyncio.run_coroutine_threadsafe(ctx.channel.send(embed=create_embeds(ctx, (f'Now playing:', f'**[{info["title"]}]({info["webpage_url"]})**\n**(`{self.get_time(info["duration"])}`)**'), thumbnail=info['thumbnail']), delete_after=15), self.bot.loop)
+            return asyncio.run_coroutine_threadsafe(ctx.channel.send(embed=create_embeds(ctx, (f'Now playing:', f'**[{info["title"]}]({info["webpage_url"]})**\n`{self.get_time(info["duration"])}`'), thumbnail=info['thumbnail'])), self.bot.loop)
 
         if check:
             del self.temp[ctx.guild.id]
@@ -223,7 +223,7 @@ class Music:
 
         self.temp[ctx.guild.id][-1] = True if not self.temp[ctx.guild.id][-1] else False
         temp = 'Looping:' if self.temp[ctx.guild.id][-1] else 'Not looping:'
-        return (create_embeds(ctx, (temp, f'**[{self.temp[ctx.guild.id][0]["title"]}]({self.temp[ctx.guild.id][0]["webpage_url"]})**')), False)
+        return (create_embeds(ctx, (temp, f'**[{self.temp[ctx.guild.id][0]["title"]}]({self.temp[ctx.guild.id][0]["webpage_url"]})**\n`{self.get_time(self.temp[ctx.guild.id][0]["duration"])}`')), False)
 
     async def queue_display(self, ctx, page):
         if not ((temp := self.check(ctx, ctx.author.voice,  ctx.guild.me.voice))[0]):
@@ -258,7 +258,7 @@ class Music:
             return (temp[1], True)
 
         if index == 1:
-            return (create_embeds(ctx, (f'You already listening to this song', 'Try to use `skip` command')), True)
+            await self.skip(ctx)
 
         if ctx.guild.id not in self.queue or index-1 > len(self.queue[ctx.guild.id]) or index < 1:
             return (create_embeds(ctx, (f'There\'s no song with this index in the queue', '')), True)

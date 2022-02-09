@@ -30,14 +30,15 @@ class PrefixCommands(commands.Cog, name='Prefix'):
 
         return (create_embeds(ctx, (f'Prefix changed successfully\nold prefix: {prefix[0]}\nNew prefix: {prefix[1]}', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
 
-    @commands.command(name='prefix', aliases=['setpre'])
+    @commands.command(name='prefix', aliases=['setpre'], description='[See, Change] the bot server prefix', usage='prefix (new_prefix)')
     async def command_prefix(self, ctx, new_prefix: str=None):
-        '''To [see | change] the prefix'''
+        '''{prefix}prefix
+        {prefix}prefix {prefix}'''
         await ctx.reply(embed=self.prefix(ctx, new_prefix)[0])
 
     @slash_command(name='prefix')
     async def slash_prefix(self, ctx, new_prefix: Option(str, 'New prefix you want to have', required=False, default=None)):
-        '''To [see | change] the prefix'''
+        '''[See, Change] the bot server prefix'''
         await ctx.respond(embed=(temp := self.prefix(ctx, new_prefix))[0], ephemeral=temp[1])
 
 

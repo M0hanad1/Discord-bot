@@ -7,7 +7,7 @@ from src.prefix.prefix import Prefix
 
 
 load_dotenv()
-bot = commands.Bot(activity=discord.Game(name='+help'), intents=discord.Intents.all(), command_prefix=Prefix().get_prefix)
+bot = commands.Bot(activity=discord.Game(name='+help'), intents=discord.Intents.all(), command_prefix=Prefix().get_prefix, help_command=None)
 bot.topggpy = topgg.DBLClient(bot, os.getenv('TOPGG_TOKEN'), autopost=True, post_shard_count=True)
 
 
