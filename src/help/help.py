@@ -87,7 +87,9 @@ class HelpView(View):
         if self.mood:
             command = self.bot.get_application_command(command, type=SlashCommand)
             embed = create_embeds(self.ctx, (f'Command: `{command.name}`', command.description), (self.bot.user.name, member_avatar(self.bot.user), f'https://top.gg/bot/{self.bot.user.id}'))
-            embed.add_field(name='Options:', value='\n'.join([f'> `{i.name}`: {i.description}' for i in command.options]))
+
+            if len(temp := (command.options)) > 0:
+                embed.add_field(name='Options:', value='\n'.join([f'> `{i.name}`: {i.description}' for i in temp]))
 
         else:
             command = self.bot.get_command(command)
