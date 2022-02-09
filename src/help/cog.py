@@ -13,7 +13,7 @@ class HelpCommand(commands.Cog):
     async def command_help(self, ctx):
         await self.help.send_bot_help(ctx, False, self.bot.cogs)
 
-    @slash_command(name='help', guild_ids=[934444583998353489])
+    @slash_command(name='help')
     async def slash_help(self, ctx):
         '''Send bot help command'''
         await self.help.send_bot_help(ctx, True, self.bot.cogs)
