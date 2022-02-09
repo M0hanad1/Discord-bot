@@ -81,7 +81,8 @@ class Games:
         start = time.time()
 
         try:
-            message = await self.bot.wait_for('message', check= lambda msg: (game == 'fast' and msg.content.lower() == word) or (game == 'spell' and msg.content.lower().strip() == ' '.join([i for i in word])), timeout=6 if game == 'fast' else 8)
+            word = word.replace('ة', 'ه')
+            message = await self.bot.wait_for('message', check= lambda msg: (game == 'fast' and msg.content.lower().replace('ة', 'ه') == word) or (game == 'spell' and msg.content.lower().strip().replace('ة', 'ه') == ' '.join([i for i in word])), timeout=7 if game == 'fast' else 9)
             result = str(time.time() - start)[:4]
             await message.reply(embed=create_embeds(ctx, (f'You Won\nYou took: `{result}` Seconds', ''), embed_author=(message.author.name, member_avatar(message.author)), embed_footer=('', '')))
             self.data.upgrade_score(ctx, message.author)
