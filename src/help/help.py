@@ -3,7 +3,7 @@ import discord
 from discord.ui import View, Select
 from discord.ext import commands
 from discord.commands import SlashCommand
-from src.functions.functions import create_embeds, member_avatar
+from src.functions.functions import create_embeds
 from typing import List
 from inspect import Parameter
 
@@ -45,7 +45,7 @@ class HelpSelect(Select['HelpView']):
 
             else:
                 view.add_item(HelpSelect(view.send_commands(cog), 'Select the command you want to see', 'command'))
-                await interaction.response.edit_message(embed=create_embeds(view.ctx, (f'Category: `{cog}`', view.send_cog_help(cog)), (view.bot.user.name, member_avatar(view.bot.user), f'https://top.gg/bot/{view.bot.user.id}')), view=view)
+                await interaction.response.edit_message(embed=create_embeds(view.ctx, (f'Category: `{cog}`', view.send_cog_help(cog)), (view.bot.user.name, view.bot.user.display_avatar, f'https://top.gg/bot/{view.bot.user.id}')), view=view)
 
         else:
             await interaction.response.edit_message(embed=await view.send_command_help(self.values[0]), view=view)
@@ -88,7 +88,7 @@ class HelpView(View):
     async def send_command_help(self, command):
         if self.mood:
             command = self.bot.get_application_command(command, type=SlashCommand)
-            embed = create_embeds(self.ctx, (f'Command: `{command.name}`', command.description), (self.bot.user.name, member_avatar(self.bot.user), f'https://top.gg/bot/{self.bot.user.id}'))
+            embed = create_embeds(self.ctx, (f'Command: `{command.name}`', command.description), (self.bot.user.name, self.bot.user.display_avatar, f'https://top.gg/bot/{self.bot.user.id}'))
 
             if len(temp := (command.options)) > 0:
                 embed.add_field(name='Options:', value='\n'.join([f'> `{i.name}`: {i.description}' for i in temp]))
@@ -97,7 +97,7 @@ class HelpView(View):
             command = self.bot.get_command(command)
             aliases = f'`{"`, `".join(command.aliases)}`' if len(command.aliases) > 0 else ''
             prefix = (await self.bot.get_prefix(self.ctx.message))[-1]
-            embed = create_embeds(self.ctx, (f'Command: `{command.name}`', command.description), (self.bot.user.name, member_avatar(self.bot.user), f'https://top.gg/bot/{self.bot.user.id}'))
+            embed = create_embeds(self.ctx, (f'Command: `{command.name}`', command.description), (self.bot.user.name, self.bot.user.display_avatar, f'https://top.gg/bot/{self.bot.user.id}'))
             usage = ''
 
             if len(aliases) > 0:
@@ -123,7 +123,7 @@ class HelpView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.ctx.author.id:
-            await interaction.response.send_message(embed=create_embeds(base_embed=('You can\'t use this command\nCreate your own help command', ''), embed_footer=(interaction.user.name, member_avatar(interaction.user))), ephemeral=True)
+            await interaction.response.send_message(embed=create_embeds(base_embed=('You can\'t use this command\nCreate your own help command', ''), embed_footer=(interaction.user.name, interaction.user.display_avatar)), ephemeral=True)
             return False
 
         return True
@@ -135,7 +135,7 @@ class Help:
 
     async def send_bot_help(self, ctx, mood, mapping):
         options = []
-        avatar = member_avatar(self.bot.user)
+        avatar = self.bot.user.display_avatar
         owner = 'https://discordapp.com/users/589198370111881216/'
         topgg = f'https://top.gg/bot/{self.bot.user.id}'
         embed = create_embeds(ctx, (f'{self.bot.user.name} Help', f'Simple discord bot made by [NOGAF]({owner}).\nThe bot has Moderations, Fun, Music and others commands.\nAnd it has custom prefix feature, score system and more.\nGive it a try.'), (self.bot.user.name, avatar, topgg), thumbnail=avatar, embed_field=[('Links:', f'> **[top.gg]({topgg})**\n> **[Invite](https://discord.com/api/oauth2/authorize?client_id=895633975274532906&permissions=8&scope=bot%20applications.commands)**\n> **[Developer]({owner})**', False)])

@@ -10,7 +10,7 @@ def create_embeds(ctx=None, base_embed=('', ''), embed_author=('', '', ''), embe
 
     if embed_footer is None:
         if ctx is not None:
-            new_embed.set_footer(text=f'{str(ctx.author.name)}#{str(ctx.author.discriminator)}', icon_url=member_avatar(ctx.author))
+            new_embed.set_footer(text=f'{str(ctx.author.name)}#{str(ctx.author.discriminator)}', icon_url=ctx.author.display_avatar)
 
     else:
         new_embed.set_footer(text=embed_footer[0], icon_url=embed_footer[1])
@@ -44,16 +44,6 @@ def create_image(string, path):
 
 def arabic_convert(string):
     return reshape(string)
-
-
-def member_avatar(member: discord.Member):
-    try:
-        avatar = member.avatar.url
-
-    except:
-        avatar = member.default_avatar.url
-
-    return avatar
 
 
 def server_avatar(server: discord.Guild):

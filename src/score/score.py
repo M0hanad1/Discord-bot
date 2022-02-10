@@ -1,6 +1,6 @@
 import discord
 from src.data.data import Data
-from src.functions.functions import create_embeds, member_avatar, server_avatar
+from src.functions.functions import create_embeds, server_avatar
 from discord.ext import commands
 
 
@@ -53,7 +53,7 @@ class Score:
 
     async def score(self, ctx, member: discord.Member):
         member = ctx.author if member is None else member
-        return create_embeds(ctx, (f'Global Score: `{self.data.get_user_global(member.id)}`\nLocal Score: `{self.data.get_user_local(ctx.guild.id, member.id)}`', ''), (member.name, member_avatar(member)))
+        return create_embeds(ctx, (f'Global Score: `{self.data.get_user_global(member.id)}`\nLocal Score: `{self.data.get_user_local(ctx.guild.id, member.id)}`', ''), (member.name, member.display_avatar))
 
     def get_mood(self, mood):
         if mood == 'global' or mood == 'g' or mood == 'discord' or mood == 'd':

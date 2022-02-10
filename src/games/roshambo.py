@@ -3,7 +3,7 @@ from discord.ui import View
 from discord.ui import Button
 from typing import List
 from random import choice
-from src.functions.functions import create_embeds, member_avatar
+from src.functions.functions import create_embeds
 
 
 class RoshamboButton(Button['Roshambo']):
@@ -32,12 +32,12 @@ class RoshamboButton(Button['Roshambo']):
 
         if (temp := view.check_winner()):
             emoji1, text1, emoji2, text2 = self.emojis[temp[0]], temp[0], self.emojis[temp[1]], temp[1]
-            await interaction.response.edit_message(embed=create_embeds(view.ctx, (f'`{emoji1}{text1}` defeat `{emoji2}{text2}`', f'**{view.chooses[text1].mention} won**'), (view.chooses[text1].name, member_avatar(view.chooses[text1])), thumbnail=member_avatar(view.chooses[text1])), view=None)
+            await interaction.response.edit_message(embed=create_embeds(view.ctx, (f'`{emoji1}{text1}` defeat `{emoji2}{text2}`', f'**{view.chooses[text1].mention} won**'), (view.chooses[text1].name, view.chooses[text1].display_avatar), thumbnail=view.chooses[text1].display_avatar), view=None)
             view.stop()
             return
 
         view.current_player = view.players[1]
-        await interaction.response.edit_message(embed=create_embeds(view.ctx, ('', f'**It\'s now {view.current_player.mention} turn\nChoose one of Rock, Paper and Scissors**'), (view.current_player.name, member_avatar(view.current_player)), thumbnail=member_avatar(view.current_player)), view=view)
+        await interaction.response.edit_message(embed=create_embeds(view.ctx, ('', f'**It\'s now {view.current_player.mention} turn\nChoose one of Rock, Paper and Scissors**'), (view.current_player.name, view.current_player.display_avatar), thumbnail=view.current_player.display_avatar), view=view)
 
 
 class Roshambo(View):
@@ -79,11 +79,11 @@ class Roshambo(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user not in self.players:
-            await interaction.response.send_message(embed=create_embeds(base_embed=('You can\'t play this game\nCreate your own game', ''), embed_footer=(interaction.user.name, member_avatar(interaction.user))), ephemeral=True)
+            await interaction.response.send_message(embed=create_embeds(base_embed=('You can\'t play this game\nCreate your own game', ''), embed_footer=(interaction.user.name, interaction.user.display_avatar)), ephemeral=True)
             return False
 
         if interaction.user.id != self.current_player.id:
-            await interaction.response.send_message(embed=create_embeds(base_embed=('It\'s not your turn', ''), embed_footer=(interaction.user.name, member_avatar(interaction.user))), ephemeral=True)
+            await interaction.response.send_message(embed=create_embeds(base_embed=('It\'s not your turn', ''), embed_footer=(interaction.user.name, interaction.user.display_avatar)), ephemeral=True)
             return False
 
         return True

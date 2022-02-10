@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from datetime import timedelta
 import humanfriendly
-from src.functions.functions import create_embeds, member_avatar, server_avatar
+from src.functions.functions import create_embeds, server_avatar
 
 
 class Mods:
@@ -21,13 +21,17 @@ class Mods:
         if filter is None:
             return message.id != msg.id
 
+        if self.temp > amount:
+            print(self.temp, amount)
+            raise
+
         if filter[0] == 'member':
-            if message.author.id == filter[1].id and message.id != msg.id and self.temp < amount:
+            if message.author.id == filter[1].id and message.id != msg.id:
                 self.temp += 1
                 return True
 
         elif filter[0] == 'role':
-            if filter[1] in message.author.roles and message.id != msg.id and self.temp < amount:
+            if filter[1] in message.author.roles and message.id != msg.id:
                 self.temp += 1
                 return True
 
@@ -41,7 +45,7 @@ class Mods:
             return (create_embeds(ctx, ('You can\'t kick this member', '')), True)
 
         await ctx.guild.kick(member, reason=reason)
-        return (create_embeds(ctx, (f'Kicked from the server\nReason: {reason}', ''), (member.name, member_avatar(member))), False)
+        return (create_embeds(ctx, (f'Kicked from the server\nReason: {reason}', ''), (member.name, member.display_avatar)), False)
 
     async def ban(self, ctx, member: discord.Member, reason: str='No reason', message_num: int=0):
         try:
@@ -62,7 +66,7 @@ class Mods:
             return (create_embeds(ctx, ('You can\'t ban this member', '')), True)
 
         await ctx.guild.ban(member, reason=reason, delete_message_days=message_num)
-        return (create_embeds(ctx, (f'Banned from the server\nReason: {reason}', ''), (member.name, member_avatar(member))), False)
+        return (create_embeds(ctx, (f'Banned from the server\nReason: {reason}', ''), (member.name, member.display_avatar)), False)
 
     async def unban(self, ctx, member: str):
         try:
@@ -81,7 +85,7 @@ class Mods:
 
             if (member_name, member_disc) == (user.name, user.discriminator):
                 await ctx.guild.unban(user)
-                return (create_embeds(ctx, ('Unbanned from the server', ''), (user.name, member_avatar(user))), False)
+                return (create_embeds(ctx, ('Unbanned from the server', ''), (user.name, user.display_avatar)), False)
 
         raise commands.MemberNotFound(member)
 
@@ -110,13 +114,13 @@ class Mods:
 
             await member.timeout(discord.utils.utcnow() + time_temp)
 
-            return (create_embeds(ctx, (f'Has been muted\nTime: {humanfriendly.format_timespan(time_temp)}\nReason: {reason}', ''), (member.name, member_avatar(member))), False)
+            return (create_embeds(ctx, (f'Has been muted\nTime: {humanfriendly.format_timespan(time_temp)}\nReason: {reason}', ''), (member.name, member.display_avatar)), False)
 
         if not member.timed_out:
             return (create_embeds(ctx, ('This member\'s not muted', '')), True)
 
         await member.remove_timeout(reason=reason)
-        return (create_embeds(ctx, (f'Has been unmuted\nReason: {reason}', ''), (member.name, member_avatar(member))), False)
+        return (create_embeds(ctx, (f'Has been unmuted\nReason: {reason}', ''), (member.name, member.display_avatar)), False)
 
     async def lock(self, ctx, channel, mood):
         perms = channel.overwrites_for(ctx.guild.default_role)
@@ -131,8 +135,13 @@ class Mods:
         return (create_embeds(ctx, (f'{channel.name} channel {mood}ed successfully!', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
 
     async def clear(self, ctx, amount, filter, mood):
+        self.temp = 0
+
         if amount < 1:
-            amount = 10
+            amount = 1
+
+        if amount > 250:
+            amount = 250
 
         if mood:
             msg = await ctx.respond(embed=create_embeds(ctx, ('Deleting channel messages...', ''), (ctx.guild.name, server_avatar(ctx.guild))))
@@ -146,8 +155,7 @@ class Mods:
             check = lambda m: self.clear_check(filter, amount, m, msg)
 
         else:
-            the_amount, amount = amount, 10000000000000
-            self.temp = 0
+            the_amount, amount = amount, 999
             check = lambda m: self.clear_check(filter, the_amount, m, msg)
 
         try:
@@ -155,9 +163,8 @@ class Mods:
             await msg.delete()
 
         except:
-            pass
+            print('-')
 
-        self.temp = 0
         await msg.channel.send(embed=create_embeds(ctx, (f'`{len(deleted)}` messages deleted successfully!', ''), (ctx.guild.name, server_avatar(ctx.guild))), delete_after=5)
 
     async def nick(self, ctx, member: discord.Member, name, reason):
@@ -178,10 +185,10 @@ class Mods:
         old_nick = member.name if member.nick is None else member.nick
 
         if old_nick == name:
-            return (create_embeds(ctx, ('That\'s the same current nickname', ''), (member.name, member_avatar(member))), True)
+            return (create_embeds(ctx, ('That\'s the same current nickname', ''), (member.name, member.display_avatar)), True)
 
         await member.edit(nick=name, reason=reason)
-        return (create_embeds(ctx, ('Nickname changed succussfully', ''), (member.name, member_avatar(member)), embed_field=[('Member:', member.mention, False), ('Old nickname:', old_nick, False), ('New nickname:', name, False), ('Reason:', reason, False)]), False)
+        return (create_embeds(ctx, ('Nickname changed succussfully', ''), (member.name, member.display_avatar), embed_field=[('Member:', member.mention, False), ('Old nickname:', old_nick, False), ('New nickname:', name, False), ('Reason:', reason, False)]), False)
 
     async def role(self, ctx, member: discord.Member, role: discord.Role, reason):
         if role.position >= ctx.author.top_role.position and ctx.guild.owner.id != ctx.author.id:
@@ -195,7 +202,7 @@ class Mods:
             await member.add_roles(role, reason=reason)
             mood = 'added'
 
-        return (create_embeds(ctx, (f'Role {mood} successfully', ''), (member.name, member_avatar(member)), embed_field=[('Member:', member.mention, False), ('Role:', role.mention, False), ('Reason', reason, False)]), False)
+        return (create_embeds(ctx, (f'Role {mood} successfully', ''), (member.name, member.display_avatar), embed_field=[('Member:', member.mention, False), ('Role:', role.mention, False), ('Reason', reason, False)]), False)
 
     async def slowmode(self, ctx, time: str, reason: str):
         try:

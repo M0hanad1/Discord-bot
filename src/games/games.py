@@ -7,7 +7,7 @@ from src.score.score import Score
 from src.games.tictactoe import TicTacToe
 from src.games.random import Random
 from src.games.roshambo import Roshambo
-from src.functions.functions import create_embeds, create_image, arabic_convert, member_avatar
+from src.functions.functions import create_embeds, create_image, arabic_convert
 
 
 class Games:
@@ -84,7 +84,7 @@ class Games:
             word = word.replace('ة', 'ه')
             message = await self.bot.wait_for('message', check= lambda msg: (game == 'fast' and msg.content.lower().replace('ة', 'ه') == word) or (game == 'spell' and msg.content.lower().strip().replace('ة', 'ه') == ' '.join([i for i in word])), timeout=7 if game == 'fast' else 9)
             result = str(time.time() - start)[:4]
-            await message.reply(embed=create_embeds(ctx, (f'You Won\nYou took: `{result}` Seconds', ''), embed_author=(message.author.name, member_avatar(message.author)), embed_footer=('', '')))
+            await message.reply(embed=create_embeds(ctx, (f'You Won\nYou took: `{result}` Seconds', ''), embed_author=(message.author.name, message.author.display_avatar), embed_footer=('', '')))
             self.data.upgrade_score(ctx, message.author)
 
         except TimeoutError:
@@ -128,7 +128,7 @@ class Games:
             return (create_embeds(ctx, ('You can\'t play with a bot', '')), True)
 
         view = TicTacToe(ctx, ctx.author, member, mood)
-        embed = create_embeds(ctx, (f'It\'s `X`\'s turn', f'**It\'s {ctx.author.mention} turn**'), (ctx.author.name, member_avatar(ctx.author)), thumbnail=member_avatar(ctx.author))
+        embed = create_embeds(ctx, (f'It\'s `X`\'s turn', f'**It\'s {ctx.author.mention} turn**'), (ctx.author.name, ctx.author.display_avatar), thumbnail=ctx.author.display_avatar)
         view.message = await ctx.respond(embed=embed, view=view) if mood else await ctx.reply(embed=embed, view=view)
 
     async def roshambo(self, ctx, member: discord.Member, mood):
@@ -142,5 +142,5 @@ class Games:
         member = member if member else self.bot.user
 
         view = Roshambo(ctx, [ctx.author, member], mood, self.bot)
-        embed = create_embeds(ctx, ('', f'**It\'s {ctx.author.mention} turn\nChoose one of Rock, Paper and Scissors**'), (ctx.author.name, member_avatar(ctx.author)), thumbnail=member_avatar(ctx.author))
+        embed = create_embeds(ctx, ('', f'**It\'s {ctx.author.mention} turn\nChoose one of Rock, Paper and Scissors**'), (ctx.author.name, ctx.author.display_avatar), thumbnail=ctx.author.display_avatar)
         view.message = await ctx.respond(embed=embed, view=view) if mood else await ctx.reply(embed=embed, view=view)

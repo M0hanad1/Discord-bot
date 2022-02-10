@@ -2,7 +2,7 @@ import discord
 from discord.ui import View
 from discord.ui import Button
 from typing import List
-from src.functions.functions import create_embeds, member_avatar
+from src.functions.functions import create_embeds
 
 
 class TicTacToeButton(Button['TicTacToe']):
@@ -23,21 +23,21 @@ class TicTacToeButton(Button['TicTacToe']):
             self.label = 'X'
             view.board[self.x][self.y] = view.X
             view.current_player = [view.player2, view.O]
-            embed = create_embeds(view.ctx, ('It\'s now `O`\'s turn', f'**It\'s now {view.player2.mention} turn**'), (view.player2.name, member_avatar(view.player2)), thumbnail=member_avatar(view.player2))
+            embed = create_embeds(view.ctx, ('It\'s now `O`\'s turn', f'**It\'s now {view.player2.mention} turn**'), (view.player2.name, view.player2.display_avatar), thumbnail=view.player2.display_avatar)
 
         else:
             self.style = discord.ButtonStyle.green
             self.label = 'O'
             view.board[self.x][self.y] = view.O
             view.current_player = [view.player1, view.X]
-            embed = create_embeds(view.ctx, ('It\'s now `X`\'s turn', f'**It\'s now {view.player1.mention} turn**'), (view.player1.name, member_avatar(view.player1)), thumbnail=member_avatar(view.player1))
+            embed = create_embeds(view.ctx, ('It\'s now `X`\'s turn', f'**It\'s now {view.player1.mention} turn**'), (view.player1.name, view.player1.display_avatar), thumbnail=view.player1.display_avatar)
 
         if (temp := view.check_winner()) is not None:
             if temp == view.X:
-                embed = create_embeds(view.ctx, ('`X` player won', f'**{view.player1.mention} Won**'), (view.player1.name, member_avatar(view.player1)), thumbnail=member_avatar(view.player1))
+                embed = create_embeds(view.ctx, ('`X` player won', f'**{view.player1.mention} Won**'), (view.player1.name, view.player1.display_avatar), thumbnail=view.player1.display_avatar)
 
             elif temp == view.O:
-                embed = create_embeds(view.ctx, ('`O` player won', f'**{view.player2.mention} Won**'), (view.player2.name, member_avatar(view.player2)), thumbnail=member_avatar(view.player2))
+                embed = create_embeds(view.ctx, ('`O` player won', f'**{view.player2.mention} Won**'), (view.player2.name, view.player2.display_avatar), thumbnail=view.player2.display_avatar)
 
             else:
                 embed = create_embeds(view.ctx, ('It\'s a tie\nNo one won', ''))
@@ -106,11 +106,11 @@ class TicTacToe(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user not in self.players:
-            await interaction.response.send_message(embed=create_embeds(base_embed=('That\'s not your game\nTry to create your own game', ''), embed_footer=(interaction.user.name, member_avatar(interaction.user))), ephemeral=True)
+            await interaction.response.send_message(embed=create_embeds(base_embed=('That\'s not your game\nTry to create your own game', ''), embed_footer=(interaction.user.name, interaction.user.display_avatar)), ephemeral=True)
             return False
 
         if interaction.user.id != self.current_player[0].id:
-            await interaction.response.send_message(embed=create_embeds(base_embed=('It\'s not your turn', ''), embed_footer=(interaction.user.name, member_avatar(interaction.user))), ephemeral=True)
+            await interaction.response.send_message(embed=create_embeds(base_embed=('It\'s not your turn', ''), embed_footer=(interaction.user.name, interaction.user.display_avatar)), ephemeral=True)
             return False
 
         return True

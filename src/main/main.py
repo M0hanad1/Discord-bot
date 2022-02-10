@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from requests import get
 from bs4 import BeautifulSoup
-from src.functions import create_embeds, member_avatar, get_banner, server_avatar
+from src.functions import create_embeds, get_banner, server_avatar
 from string import digits
 from googlesearch import search
 from googletrans import Translator
@@ -13,7 +13,7 @@ class Main:
         self.bot = bot
 
     async def info(self, ctx):
-        return create_embeds(ctx, embed_author=(self.bot.user.name, member_avatar(self.bot.user)), embed_field=[('Bot:', self.bot.user.mention, False), ('Prefix:', f'**{(await self.bot.get_prefix(ctx))[-1]}**', False), ('Developer:', '<@589198370111881216>', False)])
+        return create_embeds(ctx, embed_author=(self.bot.user.name, self.bot.user.display_avatar), embed_field=[('Bot:', self.bot.user.mention, False), ('Prefix:', f'**{(await self.bot.get_prefix(ctx))[-1]}**', False), ('Developer:', '<@589198370111881216>', False)])
 
     async def banner(self, ctx, member):
         member = ctx.author if member is None else member
@@ -21,7 +21,7 @@ class Main:
         if (banner := await get_banner(self.bot, member)) is None:
             return (create_embeds(ctx, ('This member has no banner', '')), True)
 
-        return (create_embeds(ctx, ('', f'**[Banner Link]({banner})**'), (member.name, member_avatar(member)), embed_image=banner), False)
+        return (create_embeds(ctx, ('', f'**[Banner Link]({banner})**'), (member.name, member.display_avatar), embed_image=banner), False)
 
     def get_emoji(self, ctx, emoji: discord.Emoji):
         if emoji.isdigit():
@@ -49,13 +49,13 @@ class Main:
     async def user(self, ctx, member: discord.Member):
         member = ctx.author if member is None else member
         role = 'No roles' if len(role := ' '.join([i.mention for i in member.roles if i.name not in '@everyone'])) == 0 else role
-        avatar = member_avatar(member)
+        avatar = member.display_avatar
         message = '' if (banner := await get_banner(self.bot, member)) is None else f', **[Banner]({banner})**'
         return create_embeds(ctx, ('', f'**[Avatar]({avatar})**{message}'), (member.name, avatar), thumbnail=avatar, embed_field=[('Member:', member.mention, True), ('Joined at:', f'<t:{int(member.joined_at.timestamp())}:R>', True), ('Created at:', f'<t:{int(member.created_at.timestamp())}:R>', True), ('Roles:', role, True)])
 
     def avatar(self, ctx, member: discord.Member):
         member = ctx.author if member is None else member
-        avatar = member_avatar(member)
+        avatar = member.display_avatar
         return create_embeds(ctx, ('', f'**[Avatar Link]({avatar})**'), (member.name, avatar), embed_image=avatar)
 
     def server(self, ctx):
