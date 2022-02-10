@@ -123,7 +123,7 @@ class HelpView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.ctx.author.id:
-            await interaction.response.send_message(embed=create_embeds(base_embed=('You can\'t use this command\nCreate your own help command', ''), embed_footer=(interaction.user.name, member_avatar(interaction.user))))
+            await interaction.response.send_message(embed=create_embeds(base_embed=('You can\'t use this command\nCreate your own help command', ''), embed_footer=(interaction.user.name, member_avatar(interaction.user))), ephemeral=True)
             return False
 
         return True
