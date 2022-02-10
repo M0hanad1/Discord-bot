@@ -10,13 +10,13 @@ class ScoreCommands(commands.Cog, name='Score'):
         self.bot = bot
         self.data = Score(self.bot)
 
-    @commands.command(name='score', description='Get [your, member] score', usage='score (member=you)')
+    @commands.command(name='score', description='Get [your, member] score')
     async def command_score(self, ctx, *, member: discord.Member=None):
         '''{prefix}score
         {prefix}score {mention}'''
         await ctx.reply(embed=await self.data.score(ctx, member))
 
-    @commands.command(name='top', description='Get top [global, local, both] score', usage='top (mood=both) (page=1)')
+    @commands.command(name='top', description='Get top [global, local, both] score')
     async def command_top(self, ctx, mood: str='both', page: int=1):
         '''{prefix}top
         {prefix}top local

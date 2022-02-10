@@ -1,9 +1,11 @@
+from doctest import Example
 import discord
 from discord.ui import View, Select
 from discord.ext import commands
 from discord.commands import SlashCommand
 from src.functions.functions import create_embeds, member_avatar
 from typing import List
+from inspect import Parameter
 
 
 class HelpSelect(Select['HelpView']):
@@ -53,7 +55,7 @@ class HelpView(View):
     children: List[HelpSelect]
 
     def __init__(self, bot: commands.Bot, ctx, mood, options):
-        super().__init__()
+        super().__init__(timeout=10)
         self.add_item(HelpSelect(options, 'Select the category you want to see.', 'bot'))
         self.ctx = ctx
         self.bot = bot
@@ -96,11 +98,16 @@ class HelpView(View):
             aliases = f'`{"`, `".join(command.aliases)}`' if len(command.aliases) > 0 else ''
             prefix = (await self.bot.get_prefix(self.ctx.message))[-1]
             embed = create_embeds(self.ctx, (f'Command: `{command.name}`', command.description), (self.bot.user.name, member_avatar(self.bot.user), f'https://top.gg/bot/{self.bot.user.id}'))
+            usage = ''
 
             if len(aliases) > 0:
                 embed.add_field(name='Aliases:', value=aliases, inline=False)
 
-            embed.add_field(name='Usage:', value=f'`{prefix}' + command.usage + '`', inline=False)
+            for i, j in command.params.items():
+                if i != 'self' and i != 'ctx':
+                    usage += f' ({i})' if j.default != Parameter.empty else f' [{i}]'
+
+            embed.add_field(name='Usage:', value=f'`{prefix}{command.name}{usage}`', inline=False)
             embed.add_field(name='Examples:', value=command.help.replace('{prefix}', prefix).replace('{mention}', self.ctx.author.mention).replace('{id}', str(self.ctx.author.id)).replace('{full_name}', f'{self.ctx.author.name}#{self.ctx.author.discriminator}').replace('{text_channel}', self.ctx.channel.mention).replace('{role}', self.ctx.guild.roles[-1].mention), inline=False)
 
         return embed
@@ -109,7 +116,14 @@ class HelpView(View):
         for i in self.children:
             i.disabled = True
 
-        self.stop()
+        if self.mood:
+            return await self.message.edit_original_message(view=self)
+
+        return await self.message.edit(view=self)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.ctx.author.id:
+            await interaction.response.send_message(embed=create_embeds(base_embed=('You can\'t use this command\nCreate your own help command', ''), embed_footer=(interaction.user.name, member_avatar(interaction.user))))
 
 
 class Help:
@@ -128,4 +142,5 @@ class Help:
             if len(temp := (mapping[cog].get_commands())) != 0 and cog != 'HelpCommand':
                 options.append((mapping[cog].__cog_name__, ', '.join([command.name for command in temp if (isinstance(command, commands.Command) and not mood) or (isinstance(command, discord.ApplicationCommand) and mood)])))
 
-        await ctx.respond(embed=embed, view=HelpView(self.bot, ctx, mood, options)) if mood else await ctx.reply(embed=embed, view=HelpView(self.bot, ctx, mood, options))
+        view = HelpView(self.bot, ctx, mood, options)
+        view.message = await ctx.respond(embed=embed, view=view) if mood else await ctx.reply(embed=embed, view=view)

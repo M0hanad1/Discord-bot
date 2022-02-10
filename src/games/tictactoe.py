@@ -96,18 +96,21 @@ class TicTacToe(View):
             return self.TIE
 
     async def on_timeout(self) -> None:
-        if self.mood:
-            return await self.message.edit_original_message(embed=create_embeds(self.ctx, ('Time out\nTry to create a new game', '')), view=None)
+        for i in self.children:
+            i.disabled = True
 
-        return await self.message.edit(embed=create_embeds(self.ctx, ('Time out\nTry to create a new game', '')), view=None)
+        if self.mood:
+            return await self.message.edit_original_message(embed=create_embeds(self.ctx, ('Time out\nTry to create a new game', '')), view=self)
+
+        return await self.message.edit(embed=create_embeds(self.ctx, ('Time out\nTry to create a new game', '')), view=self)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user not in self.players:
-            await interaction.response.send_message(embed=create_embeds(self.ctx, ('That\'s not your game\nTry to create your own game', '')), ephemeral=True)
+            await interaction.response.send_message(embed=create_embeds(base_embed=('That\'s not your game\nTry to create your own game', ''), embed_footer=(interaction.user.name, member_avatar(interaction.user))), ephemeral=True)
             return False
 
         if interaction.user.id != self.current_player[0].id:
-            await interaction.response.send_message(embed=create_embeds(self.ctx, ('It\'s not your turn', '')), ephemeral=True)
+            await interaction.response.send_message(embed=create_embeds(base_embed=('It\'s not your turn', ''), embed_footer=(interaction.user.name, member_avatar(interaction.user))), ephemeral=True)
             return False
 
         return True

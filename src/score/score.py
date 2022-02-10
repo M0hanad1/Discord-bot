@@ -65,21 +65,27 @@ class Score:
         else:
             return 'both'
 
-    def top(self, ctx, mood, page):
+    def top(self, ctx, mood='both', page=None):
         all_local_message = []
         all_global_message = []
         local_message = ''
         global_message = ''
 
         if mood == 'both' or mood == 'local':
-            temp_local = dict(sorted(self.data.get_all_local(ctx.guild.id).items(), key=lambda item: item[1], reverse=True))
+            members = self.data.get_all_local(ctx.guild.id)
+
+            for i in members.copy():
+                if not ctx.guild.get_member(i):
+                    del members[i]
+
+            temp_local = dict(sorted(members.items(), key=lambda item: item[1], reverse=True))
             score = (list(temp_local.keys()).index(ctx.author.id)+1, temp_local[ctx.author.id]) if ctx.author.id in temp_local else (len(temp_local)+1, 0)
             message_author = [str(ctx.author.id), score[0], score[1]]
 
             for i, j in enumerate(temp_local):
                 if i == 5 and mood == 'both':
                     if message_author[0] not in local_message:
-                        local_message += f'**{message_author[1]}- <@{message_author[0]}>: {message_author[2]}**\nMore: `top local`'
+                        local_message += f'**{message_author[1]}- <@{message_author[0]}>: {message_author[2]}**\n'
 
                     break
 
@@ -103,7 +109,7 @@ class Score:
                 if message_author[0] not in local_message:
                     local_message += f'**{message_author[1]}- <@{message_author[0]}>: {message_author[2]}**\n'
 
-                if 'More: `top local`' not in global_message and mood == 'both':
+                if mood == 'both':
                     local_message += 'More: `top local`'
 
                 all_local_message.append(local_message)
@@ -120,7 +126,7 @@ class Score:
             for i, j in enumerate(temp_global):
                 if i == 5 and mood == 'both':
                     if message_author[0] not in global_message:
-                        global_message += f'**{message_author[1]}- <@{message_author[0]}>: {message_author[2]}**\nMore: `top global`'
+                        global_message += f'**{message_author[1]}- <@{message_author[0]}>: {message_author[2]}**\n'
 
                     break
 
@@ -144,7 +150,7 @@ class Score:
                 if message_author[0] not in global_message:
                     global_message += f'**{message_author[1]}- <@{message_author[0]}>: {message_author[2]}**\n'
 
-                if 'More: `top global`' not in global_message and mood == 'both':
+                if mood == 'both':
                     global_message += 'More: `top global`'
 
                 all_global_message.append(global_message)

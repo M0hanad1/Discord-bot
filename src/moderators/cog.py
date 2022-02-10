@@ -28,14 +28,14 @@ class ModsCommands(commands.Cog, name='Mods'):
     def lock_check(ctx, channel):
         return ctx.channel if channel is None else channel
 
-    @commands.command(name='kick', description='Kick member from the server', usage='kick [member] (reason=No reason)')
+    @commands.command(name='kick', description='Kick member from the server')
     @commands.has_permissions(kick_members=True)
     async def command_kick(self, ctx, member: discord.Member, *, reason='No reason'):
         '''{prefix}kick {mention}
         {prefix}kick {mention} Spamming'''
         await ctx.reply(embed=(await self.mod.kick(ctx, member, reason))[0])
 
-    @commands.command(name='ban', description='Ban member from the server', usage='ban [member] (reason=No reason)')
+    @commands.command(name='ban', description='Ban member from the server')
     @commands.has_permissions(ban_members=True)
     async def command_ban(self, ctx, member: Union[int, discord.Member], *, reason='No reason'):
         '''{prefix}ban {mention}
@@ -43,14 +43,14 @@ class ModsCommands(commands.Cog, name='Mods'):
         {prefix}ban {mention} Swearing'''
         await ctx.reply(embed=(await self.mod.ban(ctx, member, reason))[0])
 
-    @commands.command(name='unban', description='Unban member from the server', usage='unban [member]')
+    @commands.command(name='unban', description='Unban member from the server')
     @commands.has_permissions(ban_members=True)
     async def command_unban(self, ctx, *, member: str):
         '''{prefix}unban {full_name}
         {prefix}unban {id}'''
         await ctx.reply(embed=(await self.mod.unban(ctx, member))[0])
 
-    @commands.command(name='mute', description='Mute member (with timeout)', usage='mute [member] (time=3h) (reason=No reason)')
+    @commands.command(name='mute', description='Mute member (with timeout)')
     @commands.has_permissions(moderate_members=True)
     async def command_mute(self, ctx, member: discord.Member, time='3h', *, reason='No reason'):
         '''{prefix}mute {mention}
@@ -58,46 +58,46 @@ class ModsCommands(commands.Cog, name='Mods'):
         {prefix}mute {mention} 3w Spamming'''
         await ctx.reply(embed=(await self.mod.mute(ctx, member, time, reason))[0])
 
-    @commands.command(name='unmute', description='Unmute member (from timeout)', usage='unmute [member] (reason=No reason)')
+    @commands.command(name='unmute', description='Unmute member (from timeout)')
     @commands.has_permissions(moderate_members=True)
     async def command_unmute(self, ctx, member: discord.Member, *, reason='No reason'):
         '''{prefix}unmute {mention}
         {prefix}unmute {mention} Wrong report'''
         await ctx.reply(embed=(await self.mod.mute(ctx, member, reason=reason, mood=False))[0])
 
-    @commands.command(name='lock', description='Lock a text channel', usage='lock (channel=Message\'s channel)')
+    @commands.command(name='lock', description='Lock a text channel')
     @commands.has_permissions(manage_channels=True)
     async def command_lock(self, ctx, channel: discord.TextChannel=None):
         '''{prefix}lock
         {prefix}lock {text_channel}'''
         await ctx.reply(embed=(await self.mod.lock(ctx, self.lock_check(ctx, channel), 'lock'))[0])
 
-    @commands.command(name='unlock', description='Unlock a text channel', usage='unlock (channel=Message\'s channel)')
+    @commands.command(name='unlock', description='Unlock a text channel')
     @commands.has_permissions(manage_channels=True)
     async def command_unlock(self, ctx, channel: discord.TextChannel=None):
         '''{prefix}unlock
         {prefix}unlock {text_channel}'''
         await ctx.reply(embed=(await self.mod.lock(ctx, self.lock_check(ctx, channel), 'unlock'))[0])
 
-    @commands.command(name='clear', description='Delete messages from the channel', usage='clear (amount=25)')
+    @commands.command(name='clear', description='Delete messages from the channel')
     @commands.has_permissions(manage_messages=True)
     async def command_clear(self, ctx, amount: int=25):
         '''{prefix}clear
         {prefix}clear 50'''
         await self.mod.clear(ctx, amount, None, False)
 
-    @commands.command(name='nickname', aliases=['nick'], description='Change member nickname', usage='nickname [member] (nickname=default)')
+    @commands.command(name='nickname', aliases=['nick'], description='Change member nickname')
     async def command_nick(self, ctx, member: discord.Member, *, name=None):
         '''{prefix}nickname {mention}
         {prefix}nickname {mention} Nickname'''
         await ctx.reply(embed=(await self.mod.nick(ctx, member, name, 'No reason'))[0])
 
-    @commands.command(name='role', description='[Add, Remove] role [to, from] member', usage='role [member] [role] (reason=No reason)')
+    @commands.command(name='role', description='[Add, Remove] role [to, from] member')
     async def command_role(self, ctx, member: discord.Member, role: discord.Role, *, reason='No reason'):
         '''{prefix}role {mention} {role}'''
         await ctx.reply(embed=(await self.mod.role(ctx, member, role, reason))[0])
 
-    @commands.command(name='slowmode', description='[Change, Remove] channel slowmode', usage='slowmode (time=0s) (reason=No reason)')
+    @commands.command(name='slowmode', description='[Change, Remove] channel slowmode')
     @commands.has_permissions(manage_channels=True)
     async def command_slowmode(self, ctx, time: str='0s', *, reason: str='No reason'):
         '''{prefix}slowmode 2m

@@ -2,7 +2,7 @@ import discord
 from discord.ui import View
 from discord.ui import Button
 from typing import List
-from src.functions.functions import create_embeds
+from src.functions.functions import create_embeds, member_avatar
 from random import randint
 
 
@@ -76,7 +76,7 @@ class Random(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if self.ctx.author.id != interaction.user.id:
-            await interaction.response.send_message(embed=create_embeds(self.ctx, ('You can\'t play this game\nCreate your own game', '')), ephemeral=True)
+            await interaction.response.send_message(embed=create_embeds(base_embed=('You can\'t play this game\nCreate your own game', ''), embed_footer=(interaction.user.name, member_avatar(interaction.user))), ephemeral=True)
             return False
 
         return True

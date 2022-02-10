@@ -12,64 +12,64 @@ class MainCommands(commands.Cog, name='Global'):
         self.bot = bot
         self.main = Main(self.bot)
 
-    @commands.command(name='info', description='Get information about the bot', usage='info')
+    @commands.command(name='info', description='Get information about the bot')
     async def command_info(self, ctx):
         '''{prefix}info'''
         await ctx.reply(embed=await self.main.info(ctx))
 
-    @commands.command(name='user', description='Get information about member', usage='user (member=you)')
+    @commands.command(name='user', description='Get information about member')
     async def command_user(self, ctx, member: discord.Member=None):
         '''{prefix}user
         {prefix}user {mention}'''
         await ctx.reply(embed=await self.main.user(ctx, member))
 
-    @commands.command(name='banner', description='Get member profile banner', usage='banner (member=you)')
+    @commands.command(name='banner', description='Get member profile banner')
     async def command_banner(self, ctx, member: discord.Member=None):
         '''{prefix}banner
         {prefix}banner {mention}'''
         await ctx.reply(embed=(await self.main.banner(ctx, member))[0])
 
-    @commands.command(name='avatar', description='Get member profile avatar', usage='avatar (member=you)')
+    @commands.command(name='avatar', description='Get member profile avatar')
     async def command_avatar(self, ctx, member: discord.Member=None):
         '''{prefix}avatar
         {prefix}avatar {mention}'''
         await ctx.reply(embed=self.main.avatar(ctx, member))
 
-    @commands.command(name='server', description='Get information about the server', usage='server')
+    @commands.command(name='server', description='Get information about the server')
     async def command_server(self, ctx):
         '''{prefix}server'''
         await ctx.reply(embed=self.main.server(ctx))
 
-    @commands.command(name='ping', description='Get the legacy ping', usage='ping')
+    @commands.command(name='ping', description='Get the legacy ping')
     async def command_ping(self, ctx):
         '''{prefix}ping'''
         await ctx.reply(embed=self.main.ping(ctx))
 
-    @commands.command(name='emoji', description='Get emoji link by using the [emoji, id]', usage='emoji (emoji)')
+    @commands.command(name='emoji', description='Get emoji link by using the [emoji, id]')
     async def command_emoji(self, ctx, emoji: Union[discord.Emoji, int]):
         '''{prefix}emoji <:emoji_1:843168750320353291>
         {prefix}emoji 843168750320353291'''
         await ctx.reply(embed=self.main.get_emoji(ctx, emoji)[0])
 
-    @commands.command(name='calculate', aliases=['calc'], description='Calculate a math calculation', usage='calculate (calculation)')
+    @commands.command(name='calculate', aliases=['calc'], description='Calculate a math calculation')
     async def command_calc(self, ctx, *, calculation: str):
         '''{prefix}calculation 1+1
         {prefix}calculate (1+1)x5x150/20-6'''
         await ctx.reply(embed=self.main.calc(ctx, calculation)[0])
 
-    @commands.command(name='search', description='Search for something in google', usage='search (item)')
+    @commands.command(name='search', description='Search for something in google')
     async def command_search(self, ctx, *, item: str):
         '''{prefix}search Celeste Steam
         {prefix}search Youtube'''
         temp = await ctx.reply(embed=create_embeds(ctx, ('Searching...', '')))
         await temp.edit(embed=self.main.search(ctx, item)[0])
 
-    @commands.command(name='icon', description='Get server icon', usage='icon')
+    @commands.command(name='icon', description='Get server icon')
     async def command_icon(self, ctx):
         '''{prefix}icon'''
         await ctx.reply(embed=self.main.icon(ctx)[0])
 
-    @commands.command(name='translate', aliases=['trans'], description='Translate text to default server language', usage='translate (text)')
+    @commands.command(name='translate', aliases=['trans'], description='Translate text to default server language')
     async def command_trans(self, ctx, *, text):
         '''{prefix}translate こんにちは
         {prefix}translate Водка'''
