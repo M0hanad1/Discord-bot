@@ -55,7 +55,7 @@ class HelpView(View):
     children: List[HelpSelect]
 
     def __init__(self, bot: commands.Bot, ctx, mood, options):
-        super().__init__(timeout=10)
+        super().__init__()
         self.add_item(HelpSelect(options, 'Select the category you want to see.', 'bot'))
         self.ctx = ctx
         self.bot = bot
