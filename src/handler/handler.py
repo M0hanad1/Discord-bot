@@ -37,6 +37,10 @@ class Handler:
     def role_not_found(ctx):
         return create_embeds(ctx, (f'Role not found\nI can\'t find this role', ''), (ctx.guild.name, server_avatar(ctx.guild)))
 
+    @staticmethod
+    def emoji_not_found(ctx):
+        return create_embeds(ctx, (f'Emoji not found\nI can\'t find this emoji', ''), (ctx.guild.name, server_avatar(ctx.guild)))
+
     def main(self, ctx, err):
         if isinstance(err, commands.errors.CommandNotFound):
             return
@@ -52,6 +56,9 @@ class Handler:
 
         elif isinstance(err, commands.RoleNotFound):
             return self.role_not_found(ctx)
+
+        elif isinstance(err, commands.EmojiNotFound):
+            return self.emoji_not_found(ctx)
 
         elif isinstance(err, commands.MissingPermissions):
             return self.member_missing_permissions(ctx, err)

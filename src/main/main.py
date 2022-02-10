@@ -24,19 +24,25 @@ class Main:
         return (create_embeds(ctx, ('', f'**[Banner Link]({banner})**'), (member.name, member_avatar(member)), embed_image=banner), False)
 
     def get_emoji(self, ctx, emoji: discord.Emoji):
-        if isinstance(emoji, int):
-            if get(f'https://cdn.discordapp.com/emojis/{emoji}.gif').status_code != 200:
-                if get(f'https://cdn.discordapp.com/emojis/{emoji}.png').status_code != 200:
-                    return (create_embeds(ctx, ('I can\'t find this emoji', '')), True)
-
-                else:
-                    url = f'https://cdn.discordapp.com/emojis/{emoji}.png'
-
-            else:
-                url = f'https://cdn.discordapp.com/emojis/{emoji}.gif'
+        if emoji.isdigit():
+            emoji = int(emoji)
 
         else:
-            url = emoji.url
+            try:
+                emoji = int(emoji.split(':')[2][:-1])
+
+            except:
+                raise commands.EmojiNotFound(emoji)
+
+        if get(f'https://cdn.discordapp.com/emojis/{emoji}.gif').status_code != 200:
+            if get(f'https://cdn.discordapp.com/emojis/{emoji}.png').status_code != 200:
+                raise commands.EmojiNotFound(str(emoji))
+
+            else:
+                url = f'https://cdn.discordapp.com/emojis/{emoji}.png'
+
+        else:
+            url = f'https://cdn.discordapp.com/emojis/{emoji}.gif'
 
         return (create_embeds(ctx, ('', f'**[Emoji Link]({url})**'), embed_image=url), False)
 

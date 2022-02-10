@@ -46,7 +46,7 @@ class MainCommands(commands.Cog, name='Global'):
         await ctx.reply(embed=self.main.ping(ctx))
 
     @commands.command(name='emoji', description='Get emoji link by using the [emoji, id]')
-    async def command_emoji(self, ctx, emoji: Union[discord.Emoji, int]):
+    async def command_emoji(self, ctx, emoji: str):
         '''{prefix}emoji <:emoji_1:843168750320353291>
         {prefix}emoji 843168750320353291'''
         await ctx.reply(embed=self.main.get_emoji(ctx, emoji)[0])
@@ -109,13 +109,6 @@ class MainCommands(commands.Cog, name='Global'):
     @slash_command(name='emoji')
     async def slash_emoji(self, ctx, emoji: Option(str, 'Emoji you want to get')):
         '''Get emoji link by using the [emoji, id]'''
-        if emoji.isdigit():
-            emoji = int(emoji)
-
-        else:
-            converter = commands.EmojiConverter()
-            emoji = await converter.convert(ctx, emoji)
-
         await ctx.respond(embed=(temp := self.main.get_emoji(ctx, emoji))[0], ephemeral=temp[1])
 
     @slash_command(name='calculate')

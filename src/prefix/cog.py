@@ -28,7 +28,7 @@ class PrefixCommands(commands.Cog, name='Prefix'):
         if prefix is None:
             return (create_embeds(ctx, (f'That\'s the same current prefix', ''), (ctx.guild.name, server_avatar(ctx.guild))), True)
 
-        return (create_embeds(ctx, (f'Prefix changed successfully\nold prefix: {prefix[0]}\nNew prefix: {prefix[1]}', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
+        return (create_embeds(ctx, (f'Prefix changed successfully\nOld prefix: {prefix[0]}\nNew prefix: {prefix[1]}', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
 
     @commands.command(name='prefix', aliases=['pre'], description='[See, Change] the bot server prefix')
     async def command_prefix(self, ctx, new_prefix: str=None):
