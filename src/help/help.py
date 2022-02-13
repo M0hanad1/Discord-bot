@@ -1,4 +1,3 @@
-from doctest import Example
 import discord
 from discord.ui import View, Select
 from discord.ext import commands
@@ -123,7 +122,7 @@ class HelpView(View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.ctx.author.id:
-            await interaction.response.send_message(embed=create_embeds(base_embed=('You can\'t use this command\nCreate your own help command', ''), embed_footer=(interaction.user.name, interaction.user.display_avatar)), ephemeral=True)
+            await interaction.response.send_message(embed=create_embeds(base_embed=('You can\'t use this command\nCreate your own `help` command', ''), embed_footer=(interaction.user.name, interaction.user.display_avatar)), ephemeral=True)
             return False
 
         return True

@@ -4,13 +4,13 @@ from random import choice, randint
 from discord.ext import commands
 from asyncio import TimeoutError
 from src.score.score import Score
-from src.games.tictactoe import TicTacToe
-from src.games.random import Random
-from src.games.roshambo import Roshambo
+from src.fun.tictactoe import TicTacToe
+from src.fun.random import Random
+from src.fun.roshambo import Roshambo
 from src.functions.functions import create_embeds, create_image, arabic_convert
 
 
-class Games:
+class Fun:
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.temp = {}
@@ -129,7 +129,8 @@ class Games:
 
         view = TicTacToe(ctx, ctx.author, member, mood)
         embed = create_embeds(ctx, (f'It\'s `X`\'s turn', f'**It\'s {ctx.author.mention} turn**'), (ctx.author.name, ctx.author.display_avatar), thumbnail=ctx.author.display_avatar)
-        view.message = await ctx.respond(embed=embed, view=view) if mood else await ctx.reply(embed=embed, view=view)
+        content = f'**{ctx.author.mention} VS {member.mention}**'
+        view.message = await ctx.respond(content=content, embed=embed, view=view) if mood else await ctx.reply(content=content, embed=embed, view=view)
 
     async def roshambo(self, ctx, member: discord.Member, mood):
         if member:
@@ -143,4 +144,5 @@ class Games:
 
         view = Roshambo(ctx, [ctx.author, member], mood, self.bot)
         embed = create_embeds(ctx, ('', f'**It\'s {ctx.author.mention} turn\nChoose one of Rock, Paper and Scissors**'), (ctx.author.name, ctx.author.display_avatar), thumbnail=ctx.author.display_avatar)
-        view.message = await ctx.respond(embed=embed, view=view) if mood else await ctx.reply(embed=embed, view=view)
+        content = f'**{ctx.author.mention} VS {member.mention}**'
+        view.message = await ctx.respond(content=content, embed=embed, view=view) if mood else await ctx.reply(content=content, embed=embed, view=view)
