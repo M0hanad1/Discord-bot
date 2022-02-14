@@ -9,39 +9,42 @@ class ScoreData(Data):
         super().__init__()
 
     def add_score(self, server_id, member_id, score):
-        self.update_user({'_id': member_id}, {'$set': {f'score.{server_id}': score}})
+        self.update_user({'_id': member_id}, {'$set': {f'{server_id}.score': score}})
 
     def get_user_global(self, member_id):
         result = 0
 
-        for i in self.get_user({'_id': member_id, 'score': {'$exists': True}}):
-            for j in i['score'].values():
-                result += j
+        for i in self.get_user({'_id': member_id}):
+            for j, k in i.items():
+                if j != '_id' and 'score' in k:
+                    result += k['score']
 
         return result
 
     def get_all_global(self):
         result = {}
 
-        for i in self.get_user({'score': {'$exists': True}}):
-            result[i['_id']] = 0
+        for i in self.get_user({}):
+            for j, k in i.items():
+                if j != '_id' and 'score' in k:
+                    if i['_id'] not in result:
+                        result[i['_id']] = 0
 
-            for j in i['score'].values():
-                result[i['_id']] += j
+                    result[i['_id']] += k['score']
 
         return result
 
     def get_user_local(self, server_id, member_id):
-        for i in self.get_user({'_id': member_id, f'score.{server_id}': {'$exists': True}}):
-            return i['score'][str(server_id)]
+        for i in self.get_user({'_id': member_id, f'{server_id}.score': {'$exists': True}}):
+            return i[str(server_id)]['score']
 
         return 0
 
     def get_all_local(self, server_id):
         result = {}
 
-        for i in self.get_user({f'score.{server_id}': {'$exists': True}}):
-            result[i['_id']] = i['score'][str(server_id)]
+        for i in self.get_user({f'{server_id}.score': {'$exists': True}}):
+            result[i['_id']] = i[str(server_id)]['score']
 
         return result
 

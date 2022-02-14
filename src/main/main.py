@@ -50,7 +50,7 @@ class Main:
         member = ctx.author if member is None else member
         role = '`No roles`' if len(role := '**, **'.join([i.mention for i in member.roles[::-1] if i.name not in '@everyone'])) == 0 else role
         avatar = member.display_avatar
-        message = '' if (banner := await get_banner(self.bot, member)) is None else f', **[Banner]({banner})**'
+        message = '**' if (banner := await get_banner(self.bot, member)) is None else f', [Banner]({banner})**'
         invites = 0
 
         try:
@@ -64,13 +64,13 @@ class Main:
         except discord.HTTPException:
             invites = 'Error, can\'t get the invites'
 
-        return create_embeds(ctx, ('', f'**[Avatar]({avatar})**{message}'), (member.name, avatar), thumbnail=avatar, embed_field=[
+        return create_embeds(ctx, ('', f'**[Avatar]({avatar}){message}'), (member.name, avatar), thumbnail=avatar, embed_field=[
             ('Member:', member.mention, True),
             ('Joined at:', f'<t:{int(member.joined_at.timestamp())}:R>', True),
             ('Created at:', f'<t:{int(member.created_at.timestamp())}:R>', True),
             ('ID:', f'`{member.id}`', True),
             ('Invites:', f'`{invites}`', True),
-            ('Roles:', role, False)
+            (f'Roles (`{len(member.roles[::-1])-1}`):', role, False)
             ])
 
     def avatar(self, ctx, member: discord.Member):

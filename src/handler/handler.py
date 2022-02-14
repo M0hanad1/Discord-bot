@@ -7,7 +7,7 @@ from src.functions.functions import create_embeds, server_avatar
 class Handler:
     @staticmethod
     def member_missing_permissions(ctx, err):
-        return create_embeds(ctx, (f'You must have\n`{err.missing_permissions[0].replace("_", " ").title()}` permission\nTo use this command', ''), (ctx.guild.name, server_avatar(ctx.guild)))
+        return create_embeds(ctx, (f'You must have\n`{err.missing_permissions[0].replace("_", " ").replace("guild", "server").replace("moderate members", "timeout members").title()}` permission\nTo use this command', ''), (ctx.guild.name, server_avatar(ctx.guild)))
 
     @staticmethod
     def bot_missing_permissions(ctx):
