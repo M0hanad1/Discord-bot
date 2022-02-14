@@ -53,9 +53,16 @@ class Main:
         message = '' if (banner := await get_banner(self.bot, member)) is None else f', **[Banner]({banner})**'
         invites = 0
 
-        for i in await ctx.guild.invites():
-            if i.inviter == member:
-                invites += i.uses
+        try:
+            for i in await ctx.guild.invites():
+                if i.inviter == member:
+                    invites += i.uses
+
+        except discord.Forbidden:
+            invites = 'I Must have "Manage Server" permission'
+
+        except discord.HTTPException:
+            invites = 'Error, can\'t get the invites'
 
         return create_embeds(ctx, ('', f'**[Avatar]({avatar})**{message}'), (member.name, avatar), thumbnail=avatar, embed_field=[
             ('Member:', member.mention, True),
