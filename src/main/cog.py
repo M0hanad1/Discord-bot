@@ -3,7 +3,6 @@ from discord.commands import slash_command, Option
 from discord.ext import commands
 from src.functions.functions import create_embeds
 from src.main.main import Main
-from typing import Union
 
 
 class MainCommands(commands.Cog, name='Global'):

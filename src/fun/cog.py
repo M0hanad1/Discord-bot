@@ -20,31 +20,27 @@ class FunCommands(commands.Cog, name='Fun'):
     async def command_fast(self, ctx, language='random'):
         '''{prefix}fast
         {prefix}fast arabic
-        {prefix}fast english
-        '''
+        {prefix}fast english'''
         await self.fun.typing_games(ctx, language, 'fast', False)
 
     @commands.command(name='spell', description='Try to spell the word as fast as you can')
     async def command_spell(self, ctx, language='random'):
         '''{prefix}spell
         {prefix}spell ar
-        {prefix}spell en
-        '''
+        {prefix}spell en'''
         await self.fun.typing_games(ctx, language, 'spell', False)
 
     @commands.command(name='say', description='Make the bot say something')
     async def command_say(self, ctx, *, message):
         '''{prefix}say Hello There
-        {prefix}say Hello {mention}
-        '''
+        {prefix}say Hello {mention}'''
         await ctx.reply(embed=create_embeds(ctx, ('', message)))
 
     @commands.command(name='roll', description='Get a random number with prefix command')
     async def command_roll(self, ctx, min: int=1, max: int=10):
         '''{prefix}roll
         {prefix}roll 2
-        {prefix}roll 10 15
-        '''
+        {prefix}roll 10 15'''
         await ctx.reply(embed=self.fun.roll(ctx, min, max)[0])
 
     @commands.command(name='8ball', description='Get a random answer for your question')
@@ -68,8 +64,7 @@ class FunCommands(commands.Cog, name='Fun'):
     @commands.command(name='roshambo', description='Play roshambo(Rock-Paper-Scissors) game with [me, member]')
     async def command_roshambo(self, ctx, member: discord.Member=None):
         '''{prefix}roshambo
-        {prefix}roshambo {mention}
-        '''
+        {prefix}roshambo {mention}'''
         temp = await self.fun.roshambo(ctx, member, False)
 
         if temp:
