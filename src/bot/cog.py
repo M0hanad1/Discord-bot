@@ -30,6 +30,7 @@ class BotInfoCommands(commands.Cog, name='Bot'):
         await ctx.reply(embed=await self.bot_info.dev(ctx))
 
     @commands.command(name='updates', aliases=['update', 'up'], description='[Show, Add, Remove] bot updates & new features channel')
+    @commands.has_permissions(manage_guild=True)
     async def command_updates(self, ctx, channel: discord.TextChannel=None, role: discord.Role=None):
         '''{prefix}updates
         {prefix}updates {text_channel}
@@ -39,7 +40,8 @@ class BotInfoCommands(commands.Cog, name='Bot'):
     @commands.command(name='send', description='Send bot update message to all the server', hidden=True)
     async def command_send(self, ctx, title='', description='', *, fields='None'):
         '''{prefix}send [('New', 'New feature', False), ('update', 'new update', True)]'''
-        await self.bot_info.send_updates(ctx, title, description, fields)
+        if ctx.author.id == self.bot.owner_id:
+            await self.bot_info.send_updates(ctx, title, description, fields)
 
     @slash_command(name='info')
     async def slash_info(self, ctx):
@@ -62,6 +64,7 @@ class BotInfoCommands(commands.Cog, name='Bot'):
         await ctx.respond(embed=await self.bot_info.dev(ctx))
 
     @slash_command(name='updates')
+    @commands.has_permissions(manage_guild=True)
     async def slash_updates(self, ctx, channel: Option(discord.TextChannel, 'Channel you want to [add to, remove from] bot updates & new features', required=False, default=None), role: Option(discord.Role, 'Role you want to [add to, remove from] mention when bot get update or new feature', required=False, default=None)):
         '''[Show, Add, Remove] bot updates & new features channel'''
         await ctx.respond(embed=(temp := (await self.bot_info.updates(ctx, channel, role)))[0], ephemeral=temp[1])
