@@ -11,11 +11,6 @@ class MainCommands(commands.Cog, name='Global'):
         self.bot = bot
         self.main = Main(self.bot)
 
-    @commands.command(name='info', description='Get information about the bot')
-    async def command_info(self, ctx):
-        '''{prefix}info'''
-        await ctx.reply(embed=await self.main.info(ctx))
-
     @commands.command(name='user', description='Get information about member')
     async def command_user(self, ctx, member: discord.Member=None):
         '''{prefix}user
@@ -74,11 +69,6 @@ class MainCommands(commands.Cog, name='Global'):
         {prefix}translate Водка'''
         temp = await ctx.reply(embed=create_embeds(ctx, ('Translating...', '')))
         await temp.edit(embed=self.main.trans(ctx, text)[0])
-
-    @slash_command(name='info')
-    async def slash_info(self, ctx):
-        '''Get information about the bot'''
-        await ctx.respond(embed=await self.main.info(ctx))
 
     @slash_command(name='user')
     async def slash_user(self, ctx, member: Option(discord.Member, 'Member you want to get information about', required=False, default=None)):

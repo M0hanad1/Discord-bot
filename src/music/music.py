@@ -42,7 +42,7 @@ class Music:
     def play_next(self, ctx):
         vc = ctx.voice_client
 
-        if (check := ctx.guild.id in self.temp) and self.temp[ctx.guild.id][-1]:
+        if (check := ctx.guild.id in self.temp) and self.temp[ctx.guild.id][1]:
             return self.start(ctx, vc, self.temp[ctx.guild.id][0])
 
         if ctx.guild.id in self.queue and len(self.queue[ctx.guild.id]) > 0:
@@ -209,7 +209,7 @@ class Music:
         if not vc.is_playing() and not vc.is_paused():
             return (create_embeds(ctx, ('There\'s nothing playing to skip', '')), True)
 
-        self.temp[ctx.guild.id][-1] = False
+        self.temp[ctx.guild.id][1] = False
         vc.stop()
 
     async def loop(self, ctx):
@@ -221,8 +221,8 @@ class Music:
         if not vc.is_playing() and not vc.is_paused():
             return (create_embeds(ctx, ('There\'s nothing playing to loop', '')), True)
 
-        self.temp[ctx.guild.id][-1] = True if not self.temp[ctx.guild.id][-1] else False
-        temp = 'Looping:' if self.temp[ctx.guild.id][-1] else 'Not looping:'
+        self.temp[ctx.guild.id][1] = True if not self.temp[ctx.guild.id][1] else False
+        temp = 'Looping:' if self.temp[ctx.guild.id][1] else 'Not looping:'
         return (create_embeds(ctx, (temp, f'**[{self.temp[ctx.guild.id][0]["title"]}]({self.temp[ctx.guild.id][0]["webpage_url"]})**\n`{self.get_time(self.temp[ctx.guild.id][0]["duration"])}`')), False)
 
     async def queue_display(self, ctx, page):
@@ -233,7 +233,7 @@ class Music:
             return (create_embeds(ctx, ('There\'s no songs', '')), True)
 
         message = f'**1:**\n**[{self.temp[ctx.guild.id][0]["title"]}]({self.temp[ctx.guild.id][0]["webpage_url"]})**\n'
-        message += '`Looping`\n\n' if self.temp[ctx.guild.id][-1] else '\n'
+        message += '`Looping`\n\n' if self.temp[ctx.guild.id][1] else '\n'
         all_messages = []
         num = 1
 

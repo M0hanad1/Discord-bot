@@ -36,7 +36,7 @@ class FunCommands(commands.Cog, name='Fun'):
         {prefix}say Hello {mention}'''
         await ctx.reply(embed=create_embeds(ctx, ('', message)))
 
-    @commands.command(name='roll', description='Get a random number with prefix command')
+    @commands.command(name='roll', description='Get a random number')
     async def command_roll(self, ctx, min: int=1, max: int=10):
         '''{prefix}roll
         {prefix}roll 2

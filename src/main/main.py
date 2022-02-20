@@ -12,9 +12,6 @@ class Main:
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    async def info(self, ctx):
-        return create_embeds(ctx, embed_author=(self.bot.user.name, self.bot.user.display_avatar), embed_field=[('Bot:', self.bot.user.mention, False), ('Prefix:', f'**{(await self.bot.get_prefix(ctx))[-1]}**', False), ('Developer:', '<@589198370111881216>', False)])
-
     async def banner(self, ctx, member):
         member = ctx.author if member is None else member
 

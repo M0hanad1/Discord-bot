@@ -65,7 +65,7 @@ class HelpView(View):
         message = ''
 
         for i in cog.get_commands():
-            if isinstance(i, commands.Command) and not self.mood:
+            if isinstance(i, commands.Command) and (not i.hidden) and not self.mood:
                 aliases = f'(`{", ".join(i.aliases)}`)' if len(i.aliases) > 0 else ''
                 message += f'`{i.name}`{aliases}: {i.description}\n'
 
@@ -79,7 +79,7 @@ class HelpView(View):
         options = []
 
         for i in cog.get_commands():
-            if (isinstance(i, commands.Command) and not self.mood) or (isinstance(i, discord.ApplicationCommand) and self.mood):
+            if (isinstance(i, commands.Command) and (not i.hidden) and not self.mood) or (isinstance(i, discord.ApplicationCommand) and self.mood):
                 options.append((i.name, i.description))
 
         return options
@@ -142,7 +142,7 @@ class Help:
 
         for cog in mapping:
             if len(temp := (mapping[cog].get_commands())) != 0 and cog != 'HelpCommand':
-                options.append((mapping[cog].__cog_name__, ', '.join([command.name for command in temp if (isinstance(command, commands.Command) and not mood) or (isinstance(command, discord.ApplicationCommand) and mood)])))
+                options.append((mapping[cog].__cog_name__, ', '.join([command.name for command in temp if (isinstance(command, commands.Command) and (not command.hidden) and not mood) or (isinstance(command, discord.ApplicationCommand) and mood)])))
 
         view = HelpView(self.bot, ctx, mood, options)
         view.message = await ctx.respond(embed=embed, view=view) if mood else await ctx.reply(embed=embed, view=view)

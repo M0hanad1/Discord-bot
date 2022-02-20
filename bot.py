@@ -4,10 +4,11 @@ import os
 from discord.ext import commands
 from dotenv import load_dotenv
 from src.prefix.prefix import Prefix
+from src.functions.functions import create_embeds
 
 
 load_dotenv()
-bot = commands.Bot(activity=discord.Game(name='+help'), intents=discord.Intents.all(), command_prefix=Prefix().get_prefix, help_command=None)
+bot = commands.Bot(intents=discord.Intents.all(), command_prefix=Prefix().get_prefix, help_command=None, case_insensitive=True, owner_id=589198370111881216)
 bot.topggpy = topgg.DBLClient(bot, os.getenv('TOPGG_TOKEN'), autopost=True, post_shard_count=True)
 
 
@@ -18,7 +19,25 @@ async def on_ready():
 
 @bot.event
 async def on_autopost_success():
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'{bot.topggpy.guild_count} SERVERS'))
     print(f"Posted server count ({bot.topggpy.guild_count}), shard count ({bot.shard_count})")
+
+
+@bot.event
+async def on_guild_join(guild: discord.Guild):
+    prefix = Prefix.DEFAULT_PREFIX
+    developer = await bot.fetch_user(bot.owner_id)
+    invite = 'https://discord.com/api/oauth2/authorize?client_id=895633975274532906&permissions=8&scope=bot%20applications.commands'
+    top_gg = 'https://top.gg/bot/895633975274532906'
+    embed = create_embeds(base_embed=('', f'**Thanks for [Inviting]({invite}) me to your server.\nI\'m [NGF]({invite}) a global, moderation, games, fun, music, and custom prefix bot.\nMy father\'s: [NOGAF](discordapp.com/users/{developer.id}), he\'s a really good programmer ||That\'s a lie :{{||.\nMy default prefix is: `{prefix}`, You can change it with the command: `{prefix}prefix (new_prefix)`.\nTo know all the commands, use `{prefix}help` command.\nYou can [Vote]({top_gg}/vote) for me on [top.gg]({top_gg}), if you want to support me.**'), embed_author=(bot.user.name, bot.user.display_avatar, invite), embed_footer=(f'Developer: {developer.name}#{developer.discriminator}', developer.display_avatar), thumbnail=bot.user.display_avatar)
+
+    if public_updates_channel:
+        return await guild.public_updates_channel.send(embed=embed)
+
+    if guild.system_channel:
+        return await guild.system_channel.send(embed=embed)
+
+    await guild.text_channels[0].send(embed=embed)
 
 
 for folder in os.listdir('./src'):

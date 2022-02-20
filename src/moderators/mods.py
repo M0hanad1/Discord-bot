@@ -3,12 +3,14 @@ from discord.ext import commands
 from datetime import timedelta
 import humanfriendly
 from src.functions.functions import create_embeds, server_avatar
+from src.moderators.autorole import AutoRole
 
 
 class Mods:
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.temp = 0
+        self.autoroles = AutoRole()
 
     @staticmethod
     def role_check(ctx, member: discord.Member):
@@ -220,3 +222,48 @@ class Mods:
         await ctx.channel.edit(slowmode_delay=time_temp, reason=reason)
 
         return (create_embeds(ctx, (f'{ctx.channel.name} slowmode {f"set to `{humanfriendly.format_timespan(time_temp)}`" if time_temp != 0 else "removed successfully"}\nReason: {reason}', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
+
+    async def autorole(self, ctx, role: discord.Role):
+        roles = self.autoroles.get_roles(ctx.guild.id)
+
+        for i in roles.copy():
+            if not ctx.guild.get_role(i):
+                self.autoroles.remove_role(ctx.guild.id, i)
+                roles.remove(i)
+
+        if not role:
+            if len(roles) == 0:
+                return (create_embeds(ctx, ('There\'s no `autoroles` in this server', f'**Use the command: `{(await self.bot.get_prefix(ctx.message))[-1]}autorole [role]`\nTo add autorole to the server**'), (ctx.guild.name, server_avatar(ctx.guild))), True)
+
+            return (create_embeds(ctx, embed_author=(ctx.guild.name, server_avatar(ctx.guild)), embed_field=[('Autoroles:', '**, **'.join([f'<@&{i}>' for i in roles]), False)]), False)
+
+        elif role.id in roles:
+            self.autoroles.remove_role(ctx.guild.id, role.id)
+            return (create_embeds(ctx, ('', f'**{role.mention} `removed` successfully from the autoroles of this server**'), (ctx.guild.name, server_avatar(ctx.guild))), False)
+
+        else:
+            if role.position >= ctx.guild.get_member(self.bot.user.id).top_role.position:
+                return (create_embeds(ctx, ('This role is higher than my role\nI can\'t add it', '')), True)
+
+            if len(roles) == 6:
+                return (create_embeds(ctx, ('You can just have `6` autoroles', ''), (ctx.guild.name, server_avatar(ctx.guild))), True)
+
+            self.autoroles.add_role(ctx.guild.id, role.id)
+            return (create_embeds(ctx, ('', f'**{role.mention} `added` successfully to the autoroles of this server**'), (ctx.guild.name, server_avatar(ctx.guild))), False)
+
+    async def add_autoroles(self, member: discord.Member):
+        guild: discord.Guild = member.guild
+        roles = self.autoroles.get_roles(guild.id)
+
+        for i in roles:
+            role = guild.get_role(i)
+
+            if not role:
+                self.autoroles.remove_role(guild.id, i)
+                continue
+
+            try:
+                await member.add_roles(role, reason='Auto Role')
+
+            except:
+                pass
