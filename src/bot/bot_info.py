@@ -38,49 +38,52 @@ class BotInfo:
         f'<:discord:944644804795584582> Discord | [{developer.name}#{developer.discriminator}](https://discordapp.com/users/{developer.id}/)**',
         False)])
 
-    async def updates(self, ctx, channel: discord.TextChannel, role: discord.Role):
+    async def updates(self, ctx, channel: discord.TextChannel, message: str):
         server = (ctx.guild.name, server_avatar(ctx.guild))
 
-        if len(data := self.updates_data.get_updates(ctx.guild.id)) > 0:
-            if not self.bot.get_channel(data[0]):
-                data = []
-                self.updates_data.remove_updates(ctx.guild.id)
+        if len(data := self.updates_data.get_updates(ctx.guild.id)) > 0 and not self.bot.get_channel(data[0]):
+            data = []
+            self.updates_data.remove_updates(ctx.guild.id)
 
-            elif len(data) == 2 and not ctx.guild.get_role(data[1]):
-                data.pop()
-                self.updates_data.remove_role(ctx.guild.id)
-
-        if not any([data, channel, role]):
+        if not any([data, channel, message]):
             try:
-                message = f'{(await self.bot.get_prefix(ctx.message))[-1]}updates (channel) (role)'
+                message_ = f'{(await self.bot.get_prefix(ctx.message))[-1]}updates (channel) (message)'
 
             except AttributeError:
-                message = '/updates'
+                message_ = '/updates'
 
-            return (create_embeds(ctx, ('There\'s no `updates` channel for bot updates', f'**Use the command: `{message}`\nTo add updates channel to the server**'), server), True)
+            return (create_embeds(ctx, ('There\'s no `updates` channel for bot updates', f'**Use the command: `{message_}`\nTo add updates channel to the server**'), server), True)
 
-        if data and not any([channel, role]):
-            return (create_embeds(ctx, ('', '**The `updates` server channel, you\'ll get all the bot updates in this channel**'), server, embed_field=[('Channel:', f'Channel you\'ll get updates in: {self.bot.get_channel(data[0]).mention}', False), ('Role:', 'There\'s not role will mention' if len(data) < 2 else f'Role will mentions when bot get update: {ctx.guild.get_role(data[1]).mention}', False)]), False)
+        if data and not any([channel, message]):
+            return (create_embeds(ctx, ('', '**The `updates` server channel, you\'ll get all the bot updates in this channel**'), server, embed_field=[('Channel:', f'Channel you\'ll get updates in: {self.bot.get_channel(data[0]).mention}', False), ('Message:', 'There\'s no message will send with the bot update message' if len(data) < 2 else f'Message that will send with the bot update message:\n```\n{data[1]}```', False)]), False)
 
-        if (not channel) and role and len(data) == 0:
-            return (create_embeds(ctx, ('You must choose a channel for bot updates\nNot just the role', ''), server), True)
+        if (not channel) and message and len(data) == 0:
+            return (create_embeds(ctx, ('You must choose a channel for bot updates\nNot just the message', ''), server), True)
+
+        if message and message.lower() != 'none' and not channel:
+            self.updates_data.add_message(ctx.guild.id, message)
+            return (create_embeds(ctx, ('Message updated seccessfully\nYou will get this message with the update message', ''), server), False)
 
         if channel and channel.id in data:
+            if message and message.lower() != 'none':
+                self.updates_data.add_message(ctx.guild.id, message)
+                return (create_embeds(ctx, ('Message updated seccessfully\nYou will get this message with the update message', ''), server), False)
+
             self.updates_data.remove_updates(ctx.guild.id)
             return (create_embeds(ctx, ('Channel removed successfully\nYou now won\'t get any of the bot updates', ''), server), False)
 
-        if role and role.id in data:
-            self.updates_data.remove_role(ctx.guild.id)
-            return (create_embeds(ctx, ('Role removed successfully\nThis role won\'t get mention when bot get update', ''), server), False)
+        if len(data) == 2 and message and message.lower() == 'none':
+            self.updates_data.remove_message(ctx.guild.id)
+            return (create_embeds(ctx, ('Message removed successfully\nThis message won\'t send with the bot update message', ''), server), False)
 
         self.updates_data.add_channel(ctx.guild.id, channel.id)
-        message = ''
+        field = [('Channel', channel.mention, False)]
 
-        if role:
-            self.updates_data.add_role(ctx.guild.id, role.id)
-            message = f'\nRole: {role.mention}'
+        if message and message.lower() != 'none':
+            self.updates_data.add_message(ctx.guild.id, message)
+            field.append(('Message:', f'```\n{message}```', False))
 
-        return (create_embeds(ctx, ('You now have bot updates channel', f'Channel: {channel.mention}{message}'), server), False)
+        return (create_embeds(ctx, ('', '**You now have bot updates channel**'), server, embed_field=field), False)
 
     async def send_updates(self, ctx, title, description, fields):
         title = '' if title == '0' else title
@@ -97,17 +100,12 @@ class BotInfo:
                 self.updates_data.remove_server({'_id': i[0]})
                 continue
 
-            elif not self.bot.get_channel(i[1][0]):
+            elif not (channel := self.bot.get_channel(i[1][0])):
                 self.updates_data.remove_updates(i[0])
                 continue
 
-            elif len(i[1]) == 2 and not guild.get_role(i[1][1]):
-                self.updates_data.remove_role(i[0])
-
-            channel = self.bot.get_channel(i[1][0])
-
             try:
-                await channel.send(content='||'+guild.get_role(i[1][1]).mention+'||' if len(i[1]) > 1 else None, embed=create_embeds(base_embed=(title, description), embed_author=(self.bot.user.name, self.bot.user.display_avatar, self.invite_link), embed_footer=(f'Developer: {developer.name}#{developer.discriminator}', developer.display_avatar), embed_field=fields))
+                await channel.send(content=i[1][1] if len(i[1]) > 1 else None, embed=create_embeds(base_embed=(title, description), embed_author=(self.bot.user.name, self.bot.user.display_avatar, self.invite_link), embed_footer=(f'Developer: {developer.name}#{developer.discriminator}', developer.display_avatar), embed_field=fields))
                 servers += 1
 
             except:

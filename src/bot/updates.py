@@ -11,15 +11,15 @@ class Updates(Data):
         for i in self.get_server({'updates': {'$exists': True}}):
             result[i['_id']] = [i['updates']['channel']]
 
-            if 'role' in i['updates']:
-                result[i['_id']].append(i['updates']['role'])
+            if 'message' in i['updates']:
+                result[i['_id']].append(i['updates']['message'])
 
         return result
 
     def get_updates(self, server_id):
         for i in self.get_server({'_id': server_id, 'updates': {'$exists': True}}):
-            if 'role' in i['updates']:
-                return [i['updates']['channel'], i['updates']['role']]
+            if 'message' in i['updates']:
+                return [i['updates']['channel'], i['updates']['message']]
 
             return [i['updates']['channel']]
 
@@ -32,8 +32,8 @@ class Updates(Data):
     def add_channel(self, server_id, channel_id):
         self.update_server({'_id': server_id}, {'$set': {'updates.channel': channel_id}})
 
-    def add_role(self, server_id, role_id):
-        self.update_server({'_id': server_id}, {'$set': {'updates.role': role_id}})
+    def add_message(self, server_id, message):
+        self.update_server({'_id': server_id}, {'$set': {'updates.message': message}})
 
-    def remove_role(self, server_id):
-        self.update_server({'_id': server_id}, {'$unset': {'updates.role': ''}})
+    def remove_message(self, server_id):
+        self.update_server({'_id': server_id}, {'$unset': {'updates.message': ''}})

@@ -31,11 +31,13 @@ class BotInfoCommands(commands.Cog, name='Bot'):
 
     @commands.command(name='updates', aliases=['update', 'up'], description='[Show, Add, Remove] bot updates & new features channel')
     @commands.has_permissions(manage_guild=True)
-    async def command_updates(self, ctx, channel: discord.TextChannel=None, role: discord.Role=None):
+    async def command_updates(self, ctx, channel: discord.TextChannel=None, *, message: str=None):
         '''{prefix}updates
         {prefix}updates {text_channel}
-        {prefix}updates {text_channel} {role}'''
-        await ctx.reply(embed=(await self.bot_info.updates(ctx, channel, role))[0])
+        {prefix}updates {text_channel} {role} New update
+        
+        Note: if you set the `message` to `None`, that will remove the message'''
+        await ctx.reply(embed=(await self.bot_info.updates(ctx, channel, message))[0])
 
     @commands.command(name='send', description='Send bot update message to all the server', hidden=True)
     async def command_send(self, ctx, title='', description='', *, fields='None'):
@@ -63,11 +65,11 @@ class BotInfoCommands(commands.Cog, name='Bot'):
         '''Get the developer of the bot'''
         await ctx.respond(embed=await self.bot_info.dev(ctx))
 
-    @slash_command(name='updates')
+    @slash_command(name='updates', guild_ids=[934444583998353489])
     @commands.has_permissions(manage_guild=True)
-    async def slash_updates(self, ctx, channel: Option(discord.TextChannel, 'Channel you want to [add to, remove from] bot updates & new features', required=False, default=None), role: Option(discord.Role, 'Role you want to [add to, remove from] mention when bot get update or new feature', required=False, default=None)):
+    async def slash_updates(self, ctx, channel: Option(discord.TextChannel, 'Channel you want to [add to, remove from] bot updates & new features', required=False, default=None), message: Option(str, 'Message you want to [send with, remove from] bot update message (Write `None` to remove it)', required=False, default=None)):
         '''[Show, Add, Remove] bot updates & new features channel'''
-        await ctx.respond(embed=(temp := (await self.bot_info.updates(ctx, channel, role)))[0], ephemeral=temp[1])
+        await ctx.respond(embed=(temp := (await self.bot_info.updates(ctx, channel, message)))[0], ephemeral=temp[1])
 
 
 def setup(bot: commands.Bot):
