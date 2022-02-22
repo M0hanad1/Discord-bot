@@ -65,7 +65,7 @@ class BotInfoCommands(commands.Cog, name='Bot'):
         '''Get the developer of the bot'''
         await ctx.respond(embed=await self.bot_info.dev(ctx))
 
-    @slash_command(name='updates', guild_ids=[934444583998353489])
+    @slash_command(name='updates')
     @commands.has_permissions(manage_guild=True)
     async def slash_updates(self, ctx, channel: Option(discord.TextChannel, 'Channel you want to [add to, remove from] bot updates & new features', required=False, default=None), message: Option(str, 'Message you want to [send with, remove from] bot update message (Write `None` to remove it)', required=False, default=None)):
         '''[Show, Add, Remove] bot updates & new features channel'''
