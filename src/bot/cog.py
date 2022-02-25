@@ -14,6 +14,12 @@ class BotInfoCommands(commands.Cog, name='Bot'):
         '''{prefix}info'''
         await ctx.reply(embed=await self.bot_info.info(ctx))
 
+    @commands.command(name='prefix', aliases=['pre'], description='[See, Change] the bot server prefix')
+    async def command_prefix(self, ctx, new_prefix: str=None):
+        '''{prefix}prefix
+        {prefix}prefix {prefix}'''
+        await ctx.reply(embed=self.bot_info.prefix(ctx, new_prefix)[0])
+
     @commands.command(name='invite', description='Get bot invite link')
     async def command_invite(self, ctx):
         '''{prefix}invite'''
@@ -49,6 +55,11 @@ class BotInfoCommands(commands.Cog, name='Bot'):
     async def slash_info(self, ctx):
         '''Get information about the bot'''
         await ctx.respond(embed=await self.bot_info.info(ctx))
+
+    @slash_command(name='prefix')
+    async def slash_prefix(self, ctx, new_prefix: Option(str, 'New prefix you want to have', required=False, default=None)):
+        '''[See, Change] the bot server prefix'''
+        await ctx.respond(embed=(temp := self.bot_info.prefix(ctx, new_prefix))[0], ephemeral=temp[1])
 
     @slash_command(name='invite')
     async def slash_invite(self, ctx):

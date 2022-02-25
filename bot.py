@@ -3,7 +3,7 @@ import topgg
 import os
 from discord.ext import commands
 from dotenv import load_dotenv
-from src.prefix.prefix import Prefix
+from src.bot.prefix import Prefix
 from src.functions.functions import create_embeds
 
 

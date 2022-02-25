@@ -1,6 +1,5 @@
 import discord
-from discord.ui import View
-from discord.ui import Button
+from discord.ui import View, Button
 from typing import List
 from src.functions.functions import create_embeds
 from random import randint

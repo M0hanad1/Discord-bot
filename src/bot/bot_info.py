@@ -1,15 +1,37 @@
 import discord
 from discord.ext import commands
 from src.bot.updates import Updates
+from src.bot.prefix import Prefix
 from src.functions.functions import create_embeds, server_avatar
 
 
 class BotInfo:
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        self.invite_link = 'https://discord.com/api/oauth2/authorize?client_id=895633975274532906&permissions=8&scope=bot%20applications.commands'
-        self.top_gg = 'https://top.gg/bot/895633975274532906'
         self.updates_data = Updates()
+        self.data = Prefix()
+        self.INVITE_LINK = 'https://discord.com/api/oauth2/authorize?client_id=895633975274532906&permissions=8&scope=bot%20applications.commands'
+        self.TOP_GG = 'https://top.gg/bot/895633975274532906'
+
+    def prefix(self, ctx, new_prefix):
+        if new_prefix is None:
+            return (create_embeds(ctx, (f'The current prefix is: `{self.data.prefix(ctx)}`', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
+
+        if not ctx.author.guild_permissions.administrator:
+            raise commands.MissingPermissions(['Administrator'])
+
+        if len(new_prefix) > 6:
+            return (create_embeds(ctx, (f'The prefix length should be less than or equal `6` characters', ''), (ctx.guild.name, server_avatar(ctx.guild))), True)
+
+        if new_prefix == '/':
+            return (create_embeds(ctx, (f'The prefix can\'t be a slash `/`', ''), (ctx.guild.name, server_avatar(ctx.guild))), True)
+
+        prefix = self.data.update_prefix(ctx, new_prefix)
+
+        if prefix is None:
+            return (create_embeds(ctx, (f'That\'s the same current prefix', ''), (ctx.guild.name, server_avatar(ctx.guild))), True)
+
+        return (create_embeds(ctx, (f'Prefix changed successfully\nOld prefix: `{prefix[0]}`\nNew prefix: `{prefix[1]}`', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
 
     async def info(self, ctx):
         developer = await self.bot.fetch_user(self.bot.owner_id)
@@ -21,19 +43,19 @@ class BotInfo:
             message = 'You '
 
         return create_embeds(
-            base_embed=('', f'**I\'m [NGF]({self.invite_link}) a global, moderation, games, fun, music, and custom prefix bot.\nMy developer is someone called [{developer.name}](https://discordapp.com/users/{developer.id})\n{message}can use slash commands: `/`\nYou can [Vote]({self.top_gg}/vote) for on [top.gg]({self.top_gg}) to support me.**'),
-            embed_author=(self.bot.user.name, self.bot.user.display_avatar, self.invite_link),
+            base_embed=('', f'**I\'m [NGF]({self.INVITE_LINK}) a global, moderation, games, fun, music, and custom prefix bot.\nMy developer is someone called [{developer.name}](https://discordapp.com/users/{developer.id})\n{message}can use slash commands: `/`\nYou can [Vote]({self.TOP_GG}/vote) for on [top.gg]({self.TOP_GG}) to support me.**'),
+            embed_author=(self.bot.user.name, self.bot.user.display_avatar, self.INVITE_LINK),
             embed_footer=(f'Developer: {developer.name}#{developer.discriminator}', developer.display_avatar))
 
     def invite(self, ctx):
-        return create_embeds(ctx, ('', f'**That\'s my [Invite]({self.invite_link}) link.\nHope you Enjoy!**'), (self.bot.user.name, self.bot.user.display_avatar, self.invite_link))
+        return create_embeds(ctx, ('', f'**That\'s my [Invite]({self.INVITE_LINK}) link.\nHope you Enjoy!**'), (self.bot.user.name, self.bot.user.display_avatar, self.INVITE_LINK))
 
     def vote(self, ctx):
-        return create_embeds(ctx, ('', f'**That\'s my [Vote]({self.invite_link}) link on [top.gg]({self.top_gg}).\nYour voting means a lot to me.**'), (self.bot.user.name, self.bot.user.display_avatar, self.invite_link))
+        return create_embeds(ctx, ('', f'**That\'s my [Vote]({self.INVITE_LINK}) link on [top.gg]({self.TOP_GG}).\nYour voting means a lot to me.**'), (self.bot.user.name, self.bot.user.display_avatar, self.INVITE_LINK))
 
     async def dev(self, ctx):
         developer = await self.bot.fetch_user(self.bot.owner_id)
-        return create_embeds(ctx, ('', f'**The developer is someone called [{developer.name}](https://discordapp.com/users/{developer.id}/).\nHe\'s a programmer who\'s using [Python](https://www.python.org/) language for programming, and he use [Pycord](https://pycord.readthedocs.io/) to create me.**'), (self.bot.user.name, self.bot.user.display_avatar, self.invite_link), (f'Developer: {developer.name}#{developer.discriminator}', developer.display_avatar), embed_field=[(f'{developer.name}#{developer.discriminator}:', 
+        return create_embeds(ctx, ('', f'**The developer is someone called [{developer.name}](https://discordapp.com/users/{developer.id}/).\nHe\'s a programmer who\'s using [Python](https://www.python.org/) language for programming, and he use [Pycord](https://pycord.readthedocs.io/) to create me.**'), (self.bot.user.name, self.bot.user.display_avatar, self.INVITE_LINK), (f'Developer: {developer.name}#{developer.discriminator}', developer.display_avatar), embed_field=[(f'{developer.name}#{developer.discriminator}:', 
         '**<:github:944643502162186261> Github | [M0hanad1](https://www.github.com/M0hanad1)\n' +
         f'<:discord:944644804795584582> Discord | [{developer.name}#{developer.discriminator}](https://discordapp.com/users/{developer.id}/)**',
         False)])
@@ -105,7 +127,7 @@ class BotInfo:
                 continue
 
             try:
-                await channel.send(content=i[1][1] if len(i[1]) > 1 else None, embed=create_embeds(base_embed=(title, description), embed_author=(self.bot.user.name, self.bot.user.display_avatar, self.invite_link), embed_footer=(f'Developer: {developer.name}#{developer.discriminator}', developer.display_avatar), embed_field=fields))
+                await channel.send(content=i[1][1] if len(i[1]) > 1 else None, embed=create_embeds(base_embed=(title, description), embed_author=(self.bot.user.name, self.bot.user.display_avatar, self.INVITE_LINK), embed_footer=(f'Developer: {developer.name}#{developer.discriminator}', developer.display_avatar), embed_field=fields))
                 servers += 1
 
             except:
