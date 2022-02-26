@@ -153,3 +153,14 @@ class Main:
             return (create_embeds(ctx, ('I can\'t find this language', '**Send a valid [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code**')), True)
 
         return (create_embeds(ctx, embed_field=[(f'From ({result.src}):', f'```\n{result.origin}```', False), (f'To ({result.dest}):', f'```\n{result.text}```', False)]), False)
+
+    def embed(self, ctx, title, description, color=0x000000, thumbnail='', image='', url=''):
+        try:
+            for i in [thumbnail, image, url]:
+                if len(i) > 0 and get(i).status_code != 200:
+                    raise
+
+            return (create_embeds(ctx, (title, description), embed_color=color, thumbnail=thumbnail, embed_image=image, embed_url=url), False)
+
+        except:
+            return (create_embeds(ctx, ('Wrong value\nTry again', '')), True)

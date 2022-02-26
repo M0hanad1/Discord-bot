@@ -66,8 +66,7 @@ class HelpView(View):
 
         for i in cog.get_commands():
             if isinstance(i, commands.Command) and (not i.hidden) and not self.mood:
-                aliases = f'(`{", ".join(i.aliases)}`)' if len(i.aliases) > 0 else ''
-                message += f'`{i.name}`{aliases}: {i.description}\n'
+                message += f'`{i.name}`: {i.description}\n'
 
             elif isinstance(i, discord.ApplicationCommand) and self.mood:
                 message += f'`{i.name}`: {i.description}\n'

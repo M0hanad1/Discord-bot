@@ -34,10 +34,21 @@ class MainCommands(commands.Cog, name='Global'):
         '''{prefix}server'''
         await ctx.reply(embed=self.main.server(ctx))
 
+    @commands.command(name='icon', description='Get server icon')
+    async def command_icon(self, ctx):
+        '''{prefix}icon'''
+        await ctx.reply(embed=self.main.icon(ctx)[0])
+
     @commands.command(name='ping', description='Get the legacy ping')
     async def command_ping(self, ctx):
         '''{prefix}ping'''
         await ctx.reply(embed=self.main.ping(ctx))
+
+    @commands.command(name='embed', description='Send embed message with [title, description] you want')
+    async def command_embed(self, ctx, title: str='', *, description: str=''):
+        '''{prefix}embed NGF
+        {prefix}embed NGF NGF's the best bot'''
+        await ctx.reply(embed=self.main.embed(ctx, title, description)[0])
 
     @commands.command(name='emoji', description='Get emoji link by using the [emoji, id]')
     async def command_emoji(self, ctx, emoji: str):
@@ -57,11 +68,6 @@ class MainCommands(commands.Cog, name='Global'):
         {prefix}search Youtube'''
         temp = await ctx.reply(embed=create_embeds(ctx, ('Searching...', '')))
         await temp.edit(embed=self.main.search(ctx, item)[0])
-
-    @commands.command(name='icon', description='Get server icon')
-    async def command_icon(self, ctx):
-        '''{prefix}icon'''
-        await ctx.reply(embed=self.main.icon(ctx)[0])
 
     @commands.command(name='translate', aliases=['trans'], description='Translate text to default server language')
     async def command_trans(self, ctx, *, text):
@@ -90,10 +96,26 @@ class MainCommands(commands.Cog, name='Global'):
         '''Get information about the server'''
         await ctx.respond(embed=self.main.server(ctx))
 
+    @slash_command(name='icon')
+    async def slash_icon(self, ctx):
+        '''Get server icon'''
+        await ctx.respond(embed=(temp := self.main.icon(ctx))[0], ephemeral=temp[1])
+
     @slash_command(name='ping')
     async def slash_ping(self, ctx):
         '''Get the legacy ping'''
         await ctx.respond(embed=self.main.ping(ctx))
+
+    @slash_command(name='embed')
+    async def slash_embed(self, ctx, 
+    title: Option(str, 'Title of the embed', required=False, default=''),
+    description: Option(str, 'Description of the embed', required=False, default=''),
+    color: Option(int, 'Color of the embed (must be a hex code)', required=False, default=0x000000),
+    thumbnail: Option(str, 'Thumbnail of the embed (must be a url)', required=False, default=''),
+    image: Option(str, 'Image of the embed (must be a url)', required=False, default=''),
+    url: Option(str, 'Url of the embed title (must be a url)', required=False, default='')):
+        '''Send embed message with the [title, description, color, thumbnail, image, url] you want'''
+        await ctx.respond(embed=(temp := self.main.embed(ctx, title, description, color, thumbnail, image, url))[0], ephemeral=temp[1])
 
     @slash_command(name='emoji')
     async def slash_emoji(self, ctx, emoji: Option(str, 'Emoji you want to get')):
@@ -110,11 +132,6 @@ class MainCommands(commands.Cog, name='Global'):
         '''Search for something in google'''
         await ctx.defer()
         await ctx.respond(embed=(temp := self.main.search(ctx, item))[0], ephemeral=temp[1])
-
-    @slash_command(name='icon')
-    async def slash_icon(self, ctx):
-        '''Get server icon'''
-        await ctx.respond(embed=(temp := self.main.icon(ctx))[0], ephemeral=temp[1])
 
     @slash_command(name='translate')
     async def slash_trans(self, ctx, text: Option(str, 'Text you want to convert from'), from_: Option(str, 'Language you want to translate from', required='False', default='auto', name='from'), to: Option(str, 'Language you want to translate to', required=False, default=None)):
