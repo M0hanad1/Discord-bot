@@ -1,4 +1,4 @@
-from discord.commands import errors
+from discord import errors
 from discord.ext import commands
 from discord.errors import Forbidden
 from src.functions.functions import create_embeds, server_avatar

@@ -9,33 +9,12 @@ from src.moderators.autorole import AutoRole
 class Mods:
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        self.temp = 0
         self.autoroles = AutoRole()
 
     @staticmethod
     def role_check(ctx, member: discord.Member):
         if (ctx.author.top_role.position <= member.top_role.position and member.top_role.position != 0 and ctx.guild.owner.id != ctx.author.id) or ctx.guild.owner.id == member.id:
             return True
-
-        return False
-
-    def clear_check(self, filter, amount, message, msg):
-        if filter is None:
-            return message.id != msg.id
-
-        if self.temp > amount:
-            print(self.temp, amount)
-            raise
-
-        if filter[0] == 'member':
-            if message.author.id == filter[1].id and message.id != msg.id:
-                self.temp += 1
-                return True
-
-        elif filter[0] == 'role':
-            if filter[1] in message.author.roles and message.id != msg.id:
-                self.temp += 1
-                return True
 
         return False
 
@@ -136,14 +115,12 @@ class Mods:
 
         return (create_embeds(ctx, (f'{channel.name} channel {mood}ed successfully!', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
 
-    async def clear(self, ctx, amount, filter, mood):
-        self.temp = 0
-
+    async def clear(self, ctx, amount, filter_, mood):
         if amount < 1:
             amount = 1
 
-        if amount > 250:
-            amount = 250
+        elif amount > 100:
+            amount = 100
 
         if mood:
             msg = await ctx.respond(embed=create_embeds(ctx, ('Deleting channel messages...', ''), (ctx.guild.name, server_avatar(ctx.guild))))
@@ -153,21 +130,28 @@ class Mods:
             msg = await ctx.reply(embed=create_embeds(ctx, ('Deleting channel messages...', ''), (ctx.guild.name, server_avatar(ctx.guild))))
             await ctx.message.delete()
 
-        if filter is None:
-            check = lambda m: self.clear_check(filter, amount, m, msg)
-
-        else:
-            the_amount, amount = amount, 999
-            check = lambda m: self.clear_check(filter, the_amount, m, msg)
-
         try:
-            deleted = await ctx.channel.purge(limit=amount+1, check=check)
+            deleted = 0
+
+            async for i in ctx.channel.history(limit=None if filter_ else amount+1):
+                if i.id != msg.id:
+                    if not filter_:
+                        await i.delete()
+                        deleted += 1
+
+                    elif (filter_[0] == 'member' and filter_[1].id == i.author.id) or (filter_[0] == 'role' and filter_[1] in i.author.roles):
+                        await i.delete()
+                        deleted += 1
+
+                        if deleted == amount:
+                            break
+
             await msg.delete()
 
         except:
-            print('-')
+            pass
 
-        await msg.channel.send(embed=create_embeds(ctx, (f'`{len(deleted)}` messages deleted successfully!', ''), (ctx.guild.name, server_avatar(ctx.guild))), delete_after=5)
+        await msg.channel.send(embed=create_embeds(ctx, (f'`{deleted}` messages deleted successfully!', ''), (ctx.guild.name, server_avatar(ctx.guild))), delete_after=8)
 
     async def nick(self, ctx, member: discord.Member, name, reason):
         if member != ctx.author and not ctx.author.guild_permissions.manage_nicknames:
@@ -190,9 +174,9 @@ class Mods:
             return (create_embeds(ctx, ('That\'s the same current nickname', ''), (member.name, member.display_avatar)), True)
 
         await member.edit(nick=name, reason=reason)
-        return (create_embeds(ctx, ('Nickname changed succussfully', ''), (member.name, member.display_avatar), embed_field=[('Member:', member.mention, False), ('Old nickname:', old_nick, False), ('New nickname:', name, False), ('Reason:', reason, False)]), False)
+        return (create_embeds(ctx, ('Nickname changed succussfully', ''), (member.name, member.display_avatar)), False)
 
-    async def role(self, ctx, member: discord.Member, role: discord.Role, reason):
+    async def role(self, ctx, member: discord.Member, role: discord.Role, reason='No reason'):
         if role.position >= ctx.author.top_role.position and ctx.guild.owner.id != ctx.author.id:
             return (create_embeds(ctx, ('You can\'t change this role', '')), True)
 
@@ -204,7 +188,7 @@ class Mods:
             await member.add_roles(role, reason=reason)
             mood = 'added'
 
-        return (create_embeds(ctx, (f'Role {mood} successfully', ''), (member.name, member.display_avatar), embed_field=[('Member:', member.mention, False), ('Role:', role.mention, False), ('Reason', reason, False)]), False)
+        return (create_embeds(ctx, (f'Role {mood} successfully\nReason: {reason}', '')), False)
 
     async def slowmode(self, ctx, time: str, reason: str):
         try:

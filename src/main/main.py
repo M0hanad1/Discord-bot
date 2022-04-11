@@ -99,7 +99,7 @@ class Main:
             ('ID:', f'`{guild.id}`', True), 
             ('Created at:', f'<t:{int(guild.created_at.timestamp())}:R>', True),
             ('Owner:', guild.owner.mention, True),
-            (f'Members (`{guild.member_count}`):', f'Humans: `{humands}`\nBots: `{bots}`\nBoosts: `{guild.premium_subscription_count}`', True),
+            (f'Members (`{guild.member_count}`):', f'Humans: `{humands}`\nBots: `{bots}`\nBoosters: `{guild.premium_subscription_count}`', True),
             (f'Emojis (`{len(guild.emojis)}`):', f'Animated: `{animated}`\nRegular: `{regular}`', True),
             (f'Channels (`{len(guild.text_channels) + len(guild.voice_channels)}`):', f'Text: `{len(guild.text_channels)}`\nVoice: `{len(guild.voice_channels)}`', True),
             ('Roles:', f'`{len(guild.roles)-1}`', True)
@@ -133,7 +133,7 @@ class Main:
             title = title if title else soup.find('meta', property='og:title')
             desc = soup.find('meta', attrs={'name': 'description'})
             desc = desc if desc else soup.find('meta', property='og:description')
-            return (create_embeds(ctx, ('Result:', f'**[Website]({i})**'), embed_field=[('Title:', f'**[{title}]({i})**' if title else '**No title found**', False), ('Description:', f'```\n{desc["content"]}```' if desc else '**No description found**', False)]), False)
+            return (create_embeds(ctx, ('Result:', f'**[{title}]({i})**' if title else f'[Website]({i})'), embed_field=[('Description:', f'```\n{desc["content"]}```' if desc else '**No description found**', False)]), False)
 
         return (create_embeds(ctx, ('No result found', '')), True)
 

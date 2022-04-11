@@ -108,9 +108,9 @@ class ModsCommands(commands.Cog, name='Mods'):
     @commands.command(name='role', description='[Add, Remove] role [to, from] member')
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
-    async def command_role(self, ctx, member: discord.Member, role: discord.Role, *, reason='No reason'):
+    async def command_role(self, ctx, member: discord.Member, *, role: discord.Role):
         '''{prefix}role {mention} {role}'''
-        await ctx.reply(embed=(await self.mod.role(ctx, member, role, reason))[0])
+        await ctx.reply(embed=(await self.mod.role(ctx, member, role))[0])
 
     @commands.command(name='slowmode', description='[Change, Remove] channel slowmode')
     @commands.has_permissions(manage_channels=True)
