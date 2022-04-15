@@ -39,7 +39,7 @@ class Mods:
         if member == ctx.author:
             return (create_embeds(ctx, ('You can\'t ban yourself', '')), True)
 
-        for i in await ctx.guild.bans():
+        async for i in ctx.guild.bans():
             if member == i.user:
                 return (create_embeds(ctx, ('You already banned this member', '')), True)
 
