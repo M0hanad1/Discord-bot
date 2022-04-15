@@ -61,7 +61,7 @@ class Mods:
             except:
                 raise commands.MemberNotFound(member)
 
-        for i in await ctx.guild.bans():
+        async for i in ctx.guild.bans():
             user = i.user
 
             if (member_name, member_disc) == (user.name, user.discriminator):
