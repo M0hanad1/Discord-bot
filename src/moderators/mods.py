@@ -131,20 +131,20 @@ class Mods:
             await ctx.message.delete()
 
         try:
-            deleted = 0
+            if not filter_:
+                deleted = await ctx.channel.purge(limit=amount+1, check=lambda x: x.id != msg.id)
+                deleted = len(deleted)
 
-            async for i in ctx.channel.history(limit=None if filter_ else amount+1):
-                if i.id != msg.id:
-                    if not filter_:
-                        await i.delete()
-                        deleted += 1
+            else:
+                deleted = 0
 
-                    elif (filter_[0] == 'member' and filter_[1].id == i.author.id) or (filter_[0] == 'role' and filter_[1] in i.author.roles):
-                        await i.delete()
-                        deleted += 1
+                async for i in ctx.channel.history(limit=amount*2):
+                        if (filter_[0] == 'member' and filter_[1].id == i.author.id) or (filter_[0] == 'role' and filter_[1] in i.author.roles):
+                            await i.delete()
+                            deleted += 1
 
-                        if deleted == amount:
-                            break
+                            if deleted == amount:
+                                break
 
             await msg.delete()
 
