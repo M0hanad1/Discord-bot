@@ -21,7 +21,7 @@ class MusicCommands(commands.Cog, name='Music'):
         await ctx.reply(embed=(await self.music.leave(ctx))[0])
 
     @commands.command(name='play', description='Play [video, playlist] in voice channel by [name, link]')
-    async def command_play(self, ctx, *, name):
+    async def command_play(self, ctx, *, name=None):
         '''{prefix}play Celeste Chapter 2 ost
         {prefix}play https://www.youtube.com/watch?v=iik25wqIuFo
         {prefix}play https://youtube.com/playlist?list=PLe1jcCJWvkWiWLp9h3ge0e5v7n6kxEfOG'''
@@ -84,7 +84,7 @@ class MusicCommands(commands.Cog, name='Music'):
         await ctx.respond(embed=(temp := (await self.music.leave(ctx)))[0], ephemeral=temp[1])
 
     @slash_command(name='play')
-    async def slash_play(self, ctx, name: Option(str, '[Name, Link] of the [video, playlist] you want to play')):
+    async def slash_play(self, ctx, name: Option(str, '[Name, Link] of the [video, playlist] you want to play', required=False, default=None)):
         '''Play [video, playlist] in voice channel by [name, link]'''
         await ctx.defer()
         await ctx.respond(embed=(await self.music.play(ctx, name))[0])

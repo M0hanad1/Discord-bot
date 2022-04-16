@@ -105,8 +105,13 @@ class Music:
         return (create_embeds(ctx, ('Bot left the voice channel', '')), False)
 
     async def play(self, ctx, item):
-        if not ((temp := self.check(ctx, ctx.author.voice,  ctx.guild.me.voice))[0]):
-            return (temp[1], True)
+        temp = await self.join(ctx)
+
+        if temp[1] or not item:
+            return temp
+
+        else:
+            pass
 
         YDL_OPTIONS = {'format': 'bestaudio/best', "quiet": True}
         vc = ctx.voice_client
@@ -120,7 +125,7 @@ class Music:
 
             except:
                 try:
-                    info = ydl.extract_info(f"ytsearch:{item}", download=False)['entries'][0]
+                    info = ydl.extract_info(f"ytsearch:{item} --verbose", download=False)['entries'][0]
 
                     if info is None:
                         raise
