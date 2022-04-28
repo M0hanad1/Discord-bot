@@ -108,7 +108,8 @@ class Music:
         temp = await self.join(ctx)
 
         if temp[1] or not item:
-            return temp
+            if ctx.guild.me.voice and ctx.author.voice.channel != ctx.voice_client.channel:
+                return temp
 
         else:
             pass

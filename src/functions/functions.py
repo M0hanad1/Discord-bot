@@ -1,5 +1,4 @@
 import discord
-from discord.ext import commands
 from arabic_reshaper import reshape
 from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
