@@ -55,7 +55,7 @@ class BotInfo:
 
     async def dev(self, ctx):
         developer = await self.bot.fetch_user(self.bot.owner_id)
-        return create_embeds(ctx, ('', f'**The developer is someone called [{developer.name}](https://discordapp.com/users/{developer.id}/).\nHe\'s a programmer who\'s using [Python](https://www.python.org/) language for programming, and he use [Pycord](https://pycord.readthedocs.io/) to create me.**'), (self.bot.user.name, self.bot.user.display_avatar, self.INVITE_LINK), (f'Developer: {developer.name}#{developer.discriminator}', developer.display_avatar), embed_field=[(f'{developer.name}#{developer.discriminator}:', 
+        return create_embeds(ctx, ('', f'**The developer is someone called [{developer.name}](https://discordapp.com/users/{developer.id}/).\nHe\'s a programmer who\'s using [Python](https://www.python.org/) language for programming.**'), (self.bot.user.name, self.bot.user.display_avatar, self.INVITE_LINK), (f'Developer: {developer.name}#{developer.discriminator}', developer.display_avatar), embed_field=[(f'{developer.name}#{developer.discriminator}:', 
         '**<:github:944643502162186261> Github | [M0hanad1](https://www.github.com/M0hanad1)\n' +
         f'<:discord:944644804795584582> Discord | [{developer.name}#{developer.discriminator}](https://discordapp.com/users/{developer.id}/)**',
         False)])
