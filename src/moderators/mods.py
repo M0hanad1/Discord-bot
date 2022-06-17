@@ -105,12 +105,12 @@ class Mods:
 
     async def lock(self, ctx, channel, mood):
         perms = channel.overwrites_for(ctx.guild.default_role)
-        the_mood = False if mood == 'lock' else None
+        the_mood = [False] if mood == 'lock' else [None, True]
 
-        if the_mood == perms.send_messages:
+        if perms.send_messages in the_mood:
             return (create_embeds(ctx, (f'{channel.name} channel is already {mood}ed', ''), (ctx.guild.name, server_avatar(ctx.guild))), True)
 
-        perms.send_messages = the_mood
+        perms.send_messages = the_mood[0]
         await channel.set_permissions(ctx.guild.default_role, overwrite=perms)
 
         return (create_embeds(ctx, (f'{channel.name} channel {mood}ed successfully!', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)

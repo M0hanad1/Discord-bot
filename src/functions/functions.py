@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 def create_embeds(ctx=None, base_embed=('', ''), embed_author=('', '', ''), embed_footer=None, embed_image='', thumbnail='', embed_color=0x000000, embed_field=None, embed_url=''):
-    new_embed = discord.Embed(title=base_embed[0], description=base_embed[1], color=embed_color, timestamp=datetime.utcnow(), url=embed_url)
+    new_embed = discord.Embed(title=base_embed[0], description=base_embed[1], color=embed_color, url=embed_url)
 
     if embed_footer is None:
         if ctx is not None:

@@ -48,7 +48,7 @@ class MainCommands(commands.Cog, name='Global'):
     async def command_embed(self, ctx, title: str='', *, description: str=''):
         '''{prefix}embed NGF
         {prefix}embed NGF NGF's the best bot'''
-        await ctx.reply(embed=self.main.embed(ctx, title, description)[0])
+        await ctx.send(embed=self.main.embed(ctx, title, description))
 
     @commands.command(name='emoji', description='Get emoji link by using the [emoji, id]')
     async def command_emoji(self, ctx, emoji: str):
@@ -113,9 +113,12 @@ class MainCommands(commands.Cog, name='Global'):
     color: Option(int, 'Color of the embed (must be a hex code)', required=False, default=0x000000),
     thumbnail: Option(str, 'Thumbnail of the embed (must be a url)', required=False, default=''),
     image: Option(str, 'Image of the embed (must be a url)', required=False, default=''),
-    url: Option(str, 'Url of the embed title (must be a url)', required=False, default='')):
+    url: Option(str, 'Url of the embed title (must be a url)', required=False, default=''),
+    user: Option(str, 'Show/Hide the embed author (embed footer)', required=False, default='Show', choices=['Show', 'Hide'])):
         '''Send embed message with the [title, description, color, thumbnail, image, url] you want'''
-        await ctx.respond(embed=(temp := self.main.embed(ctx, title, description, color, thumbnail, image, url))[0], ephemeral=temp[1])
+        msg = await ctx.respond('Creating Embed...')
+        await ctx.send(embed=self.main.embed(ctx, title, description, color, thumbnail, image, url, user=user.lower()))
+        await msg.delete_original_message()
 
     @slash_command(name='emoji')
     async def slash_emoji(self, ctx, emoji: Option(str, 'Emoji you want to get')):

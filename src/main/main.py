@@ -154,13 +154,16 @@ class Main:
 
         return (create_embeds(ctx, embed_field=[(f'From ({result.src}):', f'```\n{result.origin}```', False), (f'To ({result.dest}):', f'```\n{result.text}```', False)]), False)
 
-    def embed(self, ctx, title, description, color=0x000000, thumbnail='', image='', url=''):
+    def embed(self, ctx, title, description, color=0x000000, thumbnail='', image='', url='', user: bool=True):
+        if isinstance(user, str):
+            user = True if user == 'show' else False
+
         try:
             for i in [thumbnail, image, url]:
                 if len(i) > 0 and get(i).status_code != 200:
                     raise
 
-            return (create_embeds(ctx, (title, description), embed_color=color, thumbnail=thumbnail, embed_image=image, embed_url=url), False)
+            return create_embeds(ctx, (title, description), embed_color=color, thumbnail=thumbnail, embed_image=image, embed_url=url, embed_footer=None if user else ('', ''))
 
         except:
-            return (create_embeds(ctx, ('Wrong value\nTry again', '')), True)
+            return create_embeds(ctx, ('Wrong value\nTry again', ''))
