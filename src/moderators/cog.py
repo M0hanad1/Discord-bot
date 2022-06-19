@@ -32,6 +32,13 @@ class ModsCommands(commands.Cog, name='Mods'):
     async def on_member_join(self, member: discord.Member):
         await self.mod.add_autoroles(member)
 
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member, before, after):
+        if after.channel and member.id != self.bot.user.id:
+            await self.mod.create_temp_channel(member, after.channel, True)
+
+        await self.mod.create_temp_channel(member, before.channel, False)
+
     @commands.command(name='kick', description='Kick member from the server')
     @commands.has_permissions(kick_members=True)
     @commands.bot_has_permissions(kick_members=True)
@@ -120,6 +127,14 @@ class ModsCommands(commands.Cog, name='Mods'):
         {prefix}slowmode 2h Fast Chat'''
         await ctx.reply(embed=(await self.mod.slowmode(ctx, time, reason))[0])
 
+    @commands.command(name='tempvoice', aliases=['temp', 'voice'], description='[Show, Add, Remove] temp voice channel [on, to, from] the server')
+    @commands.has_permissions(manage_channels=True, manage_guild=True)
+    @commands.bot_has_permissions(manage_channels=True)
+    async def command_tempvoice(self, ctx, voice_channel: discord.VoiceChannel=None):
+        '''{prefix}tempvoice
+        {prefix}tempvoice `{voice_channel}`'''
+        await ctx.reply(embed=(await self.mod.temp_voice(ctx, voice_channel))[0])
+
     @commands.command(name='autorole', description='[Show, Add, Remove] autoroles [on, to, from] the server')
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
@@ -203,6 +218,13 @@ class ModsCommands(commands.Cog, name='Mods'):
     async def slash_slowmode(self, ctx, time: Option(str, 'New time you want to change channel slowmode to', required=False, default='0s'), reason: Option(str, 'Reason of change channel slowmode', required=False, default='No reason')):
         '''[Change, Remove] channel slowmode'''
         await ctx.respond(embed=(temp := (await self.mod.slowmode(ctx, time, reason)))[0], ephemeral=temp[1])
+
+    @slash_command(name='tempvoice')
+    @commands.has_permissions(manage_channels=True, manage_guild=True)
+    @commands.bot_has_permissions(manage_channels=True)
+    async def slash_tempvoice(self, ctx, channel: Option(discord.VoiceChannel, 'Voice channel you want to choose', required=False, default=None)):
+        '''[Show, Add, Remove] temp voice channel [on, to, from] the server'''
+        await ctx.respond(embed=(temp := (await self.mod.temp_voice(ctx, channel)))[0], ephemeral=temp[1])
 
     @slash_command(name='autorole')
     @commands.has_permissions(manage_roles=True)

@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from datetime import timedelta
 import humanfriendly
+from src.moderators.voice import TempVoice
 from src.functions.functions import create_embeds, server_avatar
 from src.moderators.autorole import AutoRole
 
@@ -10,6 +11,7 @@ class Mods:
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.autoroles = AutoRole()
+        self.voice = TempVoice()
 
     @staticmethod
     def role_check(ctx, member: discord.Member):
@@ -207,6 +209,28 @@ class Mods:
 
         return (create_embeds(ctx, (f'{ctx.channel.name} slowmode {f"set to `{humanfriendly.format_timespan(time_temp)}`" if time_temp != 0 else "removed successfully"}\nReason: {reason}', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
 
+    async def temp_voice(self, ctx, voice_channel: discord.VoiceChannel):
+        temp_voice_channel = self.voice.get_voice(ctx.guild.id)
+
+        if not voice_channel:
+            channel = self.bot.get_channel(temp_voice_channel)
+
+            if not channel:
+                if temp_voice_channel:
+                    self.voice.remove_voice(ctx.guild.id)
+
+                return (create_embeds(ctx, ('There\'s no temp voice channel on this server', ''), (ctx.guild.name, server_avatar(ctx.guild))), True)
+
+            return (create_embeds(ctx, ('', f'**Server temp voice channel: {channel.mention}**'), (ctx.guild.name, server_avatar(ctx.guild))), False)
+
+        if voice_channel.id == temp_voice_channel:
+            self.voice.remove_voice(ctx.guild.id)
+            return (create_embeds(ctx, ('Temp voice channel `removed` successfully', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
+
+        else:
+            self.voice.add_voice(ctx.guild.id, voice_channel.id)
+            return (create_embeds(ctx, ('Temp voice channel `added` successfully', ''), (ctx.guild.name, server_avatar(ctx.guild))), False)
+
     async def autorole(self, ctx, role: discord.Role):
         roles = self.autoroles.get_roles(ctx.guild.id)
 
@@ -217,7 +241,7 @@ class Mods:
 
         if not role:
             if len(roles) == 0:
-                return (create_embeds(ctx, ('There\'s no `autoroles` in this server', f'**Use the command: `{(await self.bot.get_prefix(ctx.message))[-1]}autorole [role]`\nTo add autorole to the server**'), (ctx.guild.name, server_avatar(ctx.guild))), True)
+                return (create_embeds(ctx, ('There\'s no `autoroles` in this server', f'**Use the command: `autorole [role]`\nTo add autorole to the server**'), (ctx.guild.name, server_avatar(ctx.guild))), True)
 
             return (create_embeds(ctx, embed_author=(ctx.guild.name, server_avatar(ctx.guild)), embed_field=[('Autoroles:', '**, **'.join([f'<@&{i}>' for i in roles]), False)]), False)
 
@@ -251,3 +275,19 @@ class Mods:
 
             except:
                 pass
+
+    async def create_temp_channel(self, member: discord.Member, channel: discord.VoiceChannel, mood: bool):
+        temp = self.voice.get_voice(member.guild.id)
+
+        if not (temp_channel := self.bot.get_channel(temp)):
+            self.voice.remove_voice(member.guild.id)
+            return
+
+        if mood and temp == channel.id:
+            new_channel = await channel.guild.create_voice_channel(member.name, reason='Temp voice channel', category=channel.category)
+            await member.move_to(new_channel, reason='Temp voice channel')
+            await new_channel.set_permissions(member, manage_channels=True)
+            return
+
+        if not mood and channel in temp_channel.category.voice_channels and channel.id != temp and len(channel.members) == 0:
+            await channel.delete(reason='All members left the temp voice channel')
