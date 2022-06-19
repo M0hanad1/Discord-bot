@@ -289,5 +289,5 @@ class Mods:
             await new_channel.set_permissions(member, manage_channels=True)
             return
 
-        if not mood and channel in temp_channel.category.voice_channels and channel.id != temp and len(channel.members) == 0:
+        if not mood and channel in temp_channel.category.voice_channels and channel.id != temp and (not channel.members or len(channel.members) == 0):
             await channel.delete(reason='All members left the temp voice channel')
