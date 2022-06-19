@@ -130,7 +130,7 @@ class ModsCommands(commands.Cog, name='Mods'):
     @commands.command(name='tempvoice', aliases=['temp', 'voice'], description='[Show, Add, Remove] temp voice channel [on, to, from] the server')
     @commands.has_permissions(manage_channels=True, manage_guild=True)
     @commands.bot_has_permissions(manage_channels=True)
-    async def command_tempvoice(self, ctx, voice_channel: discord.VoiceChannel=None):
+    async def command_tempvoice(self, ctx, *, voice_channel: discord.VoiceChannel=None):
         '''{prefix}tempvoice
         {prefix}tempvoice `{voice_channel}`'''
         await ctx.reply(embed=(await self.mod.temp_voice(ctx, voice_channel))[0])
