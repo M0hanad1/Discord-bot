@@ -176,7 +176,7 @@ class Mods:
             return (create_embeds(ctx, ('That\'s the same current nickname', ''), (member.name, member.display_avatar)), True)
 
         await member.edit(nick=name, reason=reason)
-        return (create_embeds(ctx, ('Nickname changed succussfully', ''), (member.name, member.display_avatar)), False)
+        return (create_embeds(ctx, ('Nickname changed successfully', ''), (member.name, member.display_avatar)), False)
 
     async def role(self, ctx, member: discord.Member, role: discord.Role, reason='No reason'):
         if role.position >= ctx.author.top_role.position and ctx.guild.owner.id != ctx.author.id:
