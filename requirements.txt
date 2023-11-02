@@ -1,5 +1,5 @@
 wheel==0.37.1
-git+https://github.com/Pycord-Development/pycord
+py-cord
 py-cord[speed]
 py-cord[voice]
 PyNaCl==1.4.0
